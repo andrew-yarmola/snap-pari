@@ -1,0 +1,2431 @@
+HELP FILE for SNAP
+------------------
+
+Each word in a command may be abbreviated to its shortest unique prefix.
+
+GENERAL COMMANDS
+
+. ?    <snap-command> 
+. help <snap-command>
+
+Prints a short description of the command. Help messages are extracted
+from the file "snap_help". To browse the whole file type "show help".
+Command words may be abbreviated to their shortest unique
+prefixes. For a quick overview of snap, read the "sample_session" in
+the data directory.  For a list of all snap commands type "menu". To
+quit type "q" or "^D".
+
+. %
+
+A %, which must be followed by a space, indicates that the remainder
+of the line is to be treated as a comment and ignored unless snap is
+in 'echoing batch mode'. In the latter case the comment, complete with
+%, is echoed on standard output. Snap is in 'echoing batch mode' if it
+is started with the flag '-be'.
+
+. quit
+
+Terminates snap. Typing the end of file character, Ctrl-D, has the
+same effect. Snap functions as a filter, reading from stdin and
+writing to stdout, and terminating when it reaches EOF. 
+
+. menu
+
+Lists all the commands available in snap. 
+
+. show menu
+. show documented
+. show undocumented
+
+Print a list of all menu items, all which are documented or all which
+are not documented. See also "menu" which calls "less". 
+
+. save menu [<filename>]
+
+Saves a copy of snap's full menu of commands, by default in the file
+"snap_menu" if no filename is supplied.
+
+. show help
+
+Browse the file "snap_help" from which help messages are extracted. 
+
+. history
+
+Show all previously entered commands (excluding the history command
+itself). 
+
+. save test
+
+Will attempt to save snap's current history in a file snap_xx.in,
+where xx is a number (supposed to be unique) in a test/ subdirectory
+of the current directory. The idea is that when Snap displays any
+unexpected behaviour (short of crashing) the sequence of commands that
+led to that behaviour can be repeated by doing "snap -be <
+test/snap_xx.in". This is useful for debugging and creating test
+suites. !! Disabled, not very useful without the Perl script used to
+run tests and compare the output between successive tests !!
+
+.
+
+GLOBAL SETTINGS
+
+. print settings
+
+Prints all current settings of the snap program. Most of these can be
+modified using the appropriate "set" or "toggle" function. 
+
+. set path
+
+The path is a list of directories to be searched whenever snap looks
+for an input file.
+
+. set shape_normalization
+
+Controls how "print shapes" gives its output. The orientation
+preserving congruence class of an ideal tetrahedron is given by the
+cross ratio of its vertices. This is well defined up to orientation
+preserving permutation of the vertices which replaces the shape
+parameter z by 1/(1-z) or 1-1/z. When shape normalization is set to 1,
+shape parameters are normalized to lie in the region |z|<=1 &
+|z-1|<1. [z -> 1-1/z rotates the upper half plane by 2*pi/3 about the
+point where these two disk boundaries intersect at 1/2 + sqrt(3)/2*i.]
+With shape normalization set to 2, the full congruence class is given
+by a shape parameter with |z-1|<=1 and Re(z)<=1/2. 
+
+. set digits_printed
+
+Allows the user to vary the number of digits printed when high
+precision real and complex numbers are printed. While the default
+internal precision of snap is 50 significant digits, the default
+digits_printed is 28. 
+
+. set hilbert_printstyle
+
+When the invariant quaternion algebra of a manifold is printed, the
+first datum to appear is a hilbert symbol (a,b). Optionally we can
+also display the ideal factorizations of a, b and 2 in the invariant
+trace field and the images of (a, b) under any real embeddings. This
+function allows us to change those options; both are off by default.
+
+. set chern_simons_diagnostic
+
+Allows us to control what is printed when "print chern_simons" is
+requested. The extra information given by switching this option on
+relates to results of W. Neumann on alternative ways of computing the
+Chern-Simons invariant. 
+
+. set dirichlet epsilon <value>
+
+Certain functions of SnapPea and snap require the computation of a
+Dirichlet domain. The computation is somewhat sensitive to roundoff
+error in the (ordinary double-precision) floating point arithmetic.
+The Dirichlet epsilon is a value used to decide whether two values are
+close enough to be considered equal. When there are problems computing
+a Dirichlet domain it may help to try different values for this. The
+default value is 1e-7. 
+
+. set accurate_dirichlet epsilon <value>
+
+Set the value used to decide whether two points are to be considered
+equal in the "accurate dirichlet" domain code. 
+
+. set dirichlet print_options <option-code>
+
+The option code is simply a number (best expressed in binary, octal or
+hexadecimal) whose bits say what the "print dirichlet" function should
+print. They are (in hexadecimal):
+
+ 0x1  Face pairing (as an O31 matrix). 
+ Ox2  Trace of face pairing element. 
+ 0x4  Trace computed via word in the group.
+ Ox8  Face pairing from word (and conjugacy). 
+ 0x10 Prefix, each entry with the face number (0 - n-1). 
+ 0x20 Face pairing as a word in the unsimplified fundamental group. 
+
+The default is 0x30. 
+
+. set precision
+
+Allows us to change the precision snap uses internally for its high
+precision computations. The default is 50. 
+
+. set degree
+
+When snap computes algebraic number fields it works with a fixed
+upper bound for the degree of the field (over the rationals). If the
+degree of the field in question is higher than snap's bound, the field
+will not be found. If on the other hand we make snap's bound too high,
+the computation will be very slow. The default bound is degree 16. In
+order to compute fields of higher degree it may also be necessary to
+change the precision (see "set precision"): in decimal digits, the
+precision should be around 3 times the degree. 
+
+. set lll_significant_digits
+
+Says what percentage of the digits of a high-precision number should
+be given to the LLL rational dependence guesser when computing
+fields. For a given precision, bigger values here will result in
+longer computation times, results which are less likely to be wrong,
+and less "spare" precision with which to check the answers. The
+default is 0.6 = 60%.
+
+. set canonical_poly_mode
+
+If a field is to be useful as a 3-manifold (or commensurability)
+invariant, it is important that the field be given a canonical
+description. If however the field is simply being used to check that
+certain equations hold, we don't really need a canonical
+description. The default value of 2 says that canonical descriptions
+should always be computed. In cases where this is unnecessary time may
+be saved by skipping this computation. With a value of 1, only the
+invariant trace field, trace field and cusp fields have their
+canonical descriptions computed. With a value of 0, none do.
+
+. set stack_size
+
+Allows the size of the pari stack to be changed. If Pari runs out of
+stack space during a computation, snap will be aborted. It is possible
+to avoid this by keeping an eye on how much space snap is using, and
+if necessary, increasing the stack size before any big computations.
+
+. toggle show_field_computation
+
+If you switch this flag on snap will give you a running commentary on
+what it is doing when it computes a field. In cases where a field
+computation fails, this may give a clue as to why. See the help on
+"compute fields" for a brief description of what snap does when it
+computes a number field.
+
+. toggle field_print_style
+
+Fields can be printed either in a compressed format, which is the
+default, or in a slightly longer format. This function switches
+between the two. 
+
+. 
+
+MANIFOLDS AND SNAP OBJECTS
+
+Snap stores up to 10 manifolds or orbifolds at a given time. The
+prompt shows a number in the range 1-10 followed by the name of the
+manifold/orbifold, followed by a colon. Most snap commands operate on
+the current manifold, either to print information out about the
+manifold, or to modify it in some way. Most information which is
+computed is cached for (faster) future use. 
+
+A manifold/orbifold is determined by either of the following two basic
+Snap (SnapPea) objects: a Triangulation or a Group. Versions of Snap
+prior to 1.11, always required a Triangulation, however this
+restriction has been somewhat lifted. Most of the "read" commands
+cause Snap to construct a Triangulation, however the "read group"
+command does not. When a Triangulation is present the prompt always
+has parentheses at the end indicating the current Dehn filling
+status. Usually "Group only" manifolds will not have parentheses as
+part of the name.
+
+If a Triangulation is present it is treated as the primary definition
+of the manifold/orbifold: if a Group is needed it will be computed
+from the Triangulation and if the Triangulation is modified, the
+group will be discarded or recomputed. Given only a Group, no attempt
+will be made to find a Triangulation. (In fact it would not always be
+possible since only restricted types of orbifold singularity can be
+represented with Snap/SnapPea ideal Triangulations.) 
+
+Any Snap command which operates on a manifold/orbifold can be used
+on a Triangulation. Some Snap commands only need a Group:
+these include most arithmetic invariants, length and ortholength
+spectra (and functions depending on them) and the symmetry and
+isometry finding functions. Transcendental invariants are not
+available for "Group only" manifolds. Some functions which make sense
+for orbifolds with singularities, such as symmetries and length
+spectra, do not yet work properly. 
+
+NOTE: it is possible to go from a Group (representing a manifold, not
+an orbifold) to a Triangulation using the "drill geodesic" command.
+
+. status
+
+Diagnostic showing what information Snap has about the current
+manifold. Most Snap objects are held by pointers which will be 0
+if the no such object is currently held. When an object is held
+further information relating to the object may also be printed.
+The five basic objects are Triangulation, Group, Domain, Tube and
+Alg. Group. 
+
+.
+
+GETTING A MANIFOLD TO WORK WITH
+
+. read census <census> <number>
+. read file <filename>
+
+Either read a census manifold or a manifold file. Eg. "r c 5 4" reads
+m004, manifold number four in the census of cusped manifolds having up
+to five tetrahedra. The search path used for the compressed (terse)
+census files (trs5, trs6, trs7), and for manifold files is printed by
+the command "print settings".
+
+. read manifold <filling-name>
+
+Reads and applies Dehn filling to a census manifold in one step:
+E.g. "r m m4(5,1)" causes the figure 8 complement, m004 to be read in
+and 5,1 surgery applied to it. C.f. "read census" and "surgery". 
+
+. read closed <n>
+
+Reads manifold n from the Hodgson-Weeks census of closed hyperbolic
+3-manifolds. Manifolds are indexed from 1 to 11031. A surgery
+description is read from the file ClosedManifolds in snap's data
+directory. 
+
+. read link <crossings> <a|n> <index>
+
+Creates a link complement from a Dowker-Thistlethwaite code in the
+knot and link tables in the files "link_data/hyperbolic_data*". The
+tables are indexed alphabetically by code starting from 1 with
+alternating and non-alternating links listed separately. E.g. the
+figure 8 knot is "4 a 1". A warning will be printed if the knot or
+link complement is non-hyperbolic.
+
+. read knot (<dowker-code> | <n-crossings> <c1> ... <cn>)
+
+Creates a knot complement from a Dowker code for the knot. The latter
+can either be given alphabetically or numerically. The numeric
+notation is described in The Knot Book and in the help for the program
+"knotscape". The alphabetic version encodes each crossing as a letter
+according to the scheme 'a'=2, 'b'=4, ... and 'A'=-2, 'B'=-4, etc.;
+the code is given as a single word whose length equals the number of
+crossings. In either case the alphabetic code is used as the name of
+the manifold. E.g. the figure 8 knot is "bcda".  See also "read
+dowker".
+
+. read dowker <DT-code>
+
+Creates a link complement from a Dowker-Thistlethwaite code.
+For knots this is just the Dowker code preceded by 
+<crossings>a<crossings> where <crossings> is a single letter 
+code for a number "a=1,b=2...". E.g. figure 8 knot is "dadbcda".
+More generally we have 
+<crossings><n-cpts><crossings-cpt-1>...<crossings-cpt-n><cpt-1-code>...
+
+. read group <file>
+
+Reads a (hopefully discrete) group of isometries of hyperbolic 3-space
+also known as a Kleinian group. The result will be a manifold given
+by its fundamental group (and holonomy representation thereof) alone. 
+The name of the manifold is the file name with any ".grp" extension
+removed. 
+
+. manifold <number>
+
+Sets the current manifold to which any further command is supplied and
+updates the prompt accordingly. Snap can store up to 10 manifolds
+numbered 1-10. Most commands implicitly operate on the current
+manifold. A few also take a manifold number to indicate a second
+manifold as input, or a place to store output. 
+
+. list 
+
+Lists all the manifolds currently in snap's memory. Use "manifold n"
+to change the current manifold. 
+
+. save manifold [<name>]
+
+Saves a SnapPea format file of the manifold. The default filename is 
+the root name if the manifold is complete, and the root name
+followed by surgery coefficients if any cusp has been filled. Eg.
+m004(5,1) is saved (by default) in m004_5_1.
+
+. save group [<filename>]
+
+Saves the fundamental group in a file (called by default <name>.grp
+where name is the name of the manifold.) This can then be read in by
+"read group".
+
+. clear manifold
+
+Discards the current manifold and updates the prompt accordingly. 
+
+. save terse
+. read terse <num-tet> <index> 
+
+These functions enable the user to maintain a database of SnapPea type
+Triangulations without cluttering up their computer with Triangulation
+files. When "save terse" is first used a subdirectory of the users
+home directory called "terse/" is created. The triangulation itself is
+saved in, or appended to, a file trsTxx where xx is the number of
+tetrahedra, and the the function prints out "<num-tet>.<index>". 
+To retrieve the triangulation later do "read terse <num-tet> <index>". 
+There is no way at present to delete unwanted triangulations. 
+Duplicate triangulation will not be saved; the index of the existing
+entry will be printed out instead. 
+
+.
+
+INVARIANTS
+
+. print homology
+
+Prints the homology of the manifold as computed by SnapPea. The
+output is made canonical by being maximally compressed: Z/6 is printed
+as Z/6 rather than Z/2 + Z/3. 
+
+. print nonperipheral
+
+Prints the non-peripheral Z/2 (first) homology of the
+manifold. I.e. the quotient of the Z/2 homology by the subgroup
+generated by the inclusion of the cusp linking tori. This is mainly
+provided as a diagnostic for Neumann's Chern-Simons formula which
+requires an extra term if this homology is non-trivial. 
+
+. print cusp homology_kernel
+
+Prints a basis (as a Pari matrix) for the kernel of the inclusion of
+the cusp homology (Z^2c, where c is the number of cusps) into the
+homology of the manifold. Each column gives a basis vector. An
+element of the kernel belonging to a single cusp represents a
+"natural longitude" of the manifold. 
+
+.
+
+TRANSCENDENTAL INVARIANTS (exc. ETA)
+
+. snappea volume
+. snappea chern_simons
+. print volume
+. print chern_simons
+
+Print the volume or Chern-Simons invariant of the manifold, either to
+the current precision, or simply as a double precision floating point
+value as computed by SnapPea.
+
+The Chern-Simons invariant depends on a "fudge" constant which is
+computed by a "bootstrapping" process via surgery relations between
+manifolds. If this is not available for the manifold in question
+(ie. it is not a census manifold, and it was not saved in the file
+from which the manifold was loaded) "snappea chern_simons" gives up;
+"print chern_simons" however uses a different formula (due to
+W.Neumann) which still gives an answer modulo 1/24.
+
+. bootstrap chern_simons
+
+First proceeds as per "drill standard", finding if possible a filling
+of a manifold in the standard set which is isometric with the current
+manifold. Using the surgery formula we can compute the Chern-Simons
+invariant of the (partially) filled standard manifold. Since the two
+manifolds are isometric, this gives us the Chern-Simons invariant of
+the current manifold, or its negative if the isometry is orientation
+reversing. (Unlike "bootstrap eta", the result of the drilling is not
+kept.)
+
+. print cscorrection
+
+This is a diagnostic I added to try to figure out what was going wrong
+when I tried to implement an improved formula for the Chern-Simons
+invariant. The formula includes a contribution arising from the way
+the tetrahedra in an ideal triangulation are glued together. 
+
+. print complex_volume
+
+Uses a formula of W.D.Neumann to compute the Chern-Simons invariant
+without recourse to any bootstrapping procedure. This uses
+barycentric subdivision in order to obtain a triangulation with
+ordered vertices such that the orderings match on adjacent faces. 
+The method is slow because one has to compute a flattening (which
+involves non-trivial linear algebra) for a triangulation with 24
+times the original number of tetrahedra. 
+
+. print -2 complex_volume
+
+Uses a formula of W.D.Neumann to compute the Chern-Simons invariant
+without recourse to bootstrapping. This method is only available for
+triangulations which admit an acyclic edge ordering: see
+"acyclic_edges". The existence of an acyclic edge ordering allows one
+to order the vertices of each tetrahedron of the triangulation such
+that the orderings agree on adjacent faces. Unfortunately, for
+reasons which are unclear at present, this method does not always
+seem to give the right answer. Currently only a machine precision 
+answer is given. 
+
+. acyclic_edges
+
+Tries to find all possible ways to orient the edges of an ideal
+triangulation such that no three edges around any face form a cycle. 
+The results are printed out as vectors with entries +/-1, giving the
+edge orientations relative to some internally fixed orientation. The
+results, if non-empty, can be used to call "print -2 complex_volume". 
+
+. 
+
+DIRICHLET DOMAINS AND GEODESICS
+
+. compute dirichlet
+
+Computes a Dirichlet domain to machine precision as in SnapPea, and
+prints some diagnostic data. For functions requiring a Dirichlet
+domain this computation is normally done automatically and silently. 
+See also "accurate dirichlet". 
+
+. print dirichlet
+
+Prints out a selection of the information stored in snap's extension
+of the SnapPea Dirichlet domain structure. The first thing printed is
+an O(3,1) matrix conjugating between coordinates in which the
+basepoint of the Dirichlet domain is at the origin and the coordinates
+in which the generators for the fundamental group were originally
+given to the Dirichlet domain finding code. 
+
+The rest is controlled by the "Options for print dirichlet" entry of
+the settings. (See "set dirichlet print_options" and "print
+settings".) The default is to print (for each face) face number, word
+in unsimplified fundamental group for the face pairing, matrix for
+face pairing (directly from the SnapPea structure), and the matrix
+computed again via word and conjugating element (as a diagnostic). 
+
+. drill dirichlet <f-pair-num> <n>
+
+This function is supposed to compute the result of drilling a simple
+closed curve dual to the given face-pair of a dirichlet domain for the
+current manifold (and save the result as manifold n). In fact it seems
+to crash as often as not. Conceptually the idea is to first glue
+together the named face pair to get (when the paired faces are
+non-adjacent) a solid torus; the remaining face pairings on the
+boundary of this solid torus give it a structure similar to that of a
+tube domain.
+
+. accurate dirichlet
+
+Computes a Dirichlet domain to high precision and then prints its
+volume. This function is fairly slow, sometimes fails, and prints lots
+of diagnostic output. The resulting Dirichlet domain is not the same
+kind of object as the usual Dirichlet domain and cannot be used to
+compute tilings etc. In fact it is discarded immediately after being
+used to compute the volume.
+
+. save dirichlet
+. convert dirichlet
+
+The first function saves a plain text file "dirichlet.words"
+containing a conjugacy matrix which transforms between the coordinates
+for the Dirichlet domain (centered at the origin) and the unsimplified
+fundamental group generators coming from a set of positioned
+tetrahedra (see "print tetrahedra").
+
+The second converts "dirichlet.words" into "dirichlet.mats" which can
+be read by SnapPea and turned into a Dirichlet domain. 
+
+. flat dirichlet
+. save flat dirichlet
+
+When the result of Dehn surgery is a flat manifold it is possible to
+compute the hyperbolic orbifold quotient of H^2 by the image of the
+SL(2,R) representation. The first function computes a 2-D Dirichlet
+domain for this group and prints out various bits of information about
+the orbifold. The second writes the information into the file
+"dirichlet.words". This can be converted into matrix form by "convert
+dirichlet". 
+
+. save generators
+
+Saves matrix generators for the fundamental group of the manifold in
+a format readable by SnapPea. 
+
+. print length_spectrum <cutoff> 
+
+Prints complex lengths up to real length cutoff. Following each length
+is a list of the geodesics which realize this length. Geodesics with
+conjugate lengths are listed together; if the length of a geodesic is
+the conjugate of the listed length, its number is followed by an
+asterisk. See also "print symmetry orbits". 
+
+. print geodesics <max_length>
+
+Lists all closed geodesics in the manifold up to the given length.
+For each geodesic we give its (complex) length and a word in the
+generators of the (unsimplified) fundamental group. This function
+works by computing a Dirichlet domain for the manifold and then tiling
+an appropriate region of hyperbolic space. Thus if max-length is too
+big the function will take a very long time. (A max-length of 2.5 is
+probably a reasonable place to start.) If snap runs into problems
+computing the Dirichlet domain, trying different values for the
+"vertex epsilon" can sometimes help (see "set vertex_epsilon").
+
+. print injectivity_radii <max_length>
+
+Prints all geodesics up to real length max_length along with the
+injectivity radius (half the real orthodistance to the nearest
+non-identical lift) of each one. 
+
+Warning: if the list includes a very short geodesic it will most
+likely have a large injectivity radius. In order to find this the
+program will have to tile to that radius and this can take a long
+time. !!Should have some way to bypass short geodesics.!!
+
+. print ortholines <cutoff> <g1> [.. <gn>]
+
+Prints all ortholines between closed geodesics g1..gn up to a real
+orthodistance of cutoff. An ortholine is a geodesic segment running
+perpendicularly, either from a closed geodesic to itself, or from one
+closed geodesic to another.
+
+The function fixes a coordinate system for the link of each specified
+geodesic such that distance along a geodesic and angle around it are
+the real and imaginary parts respectively of a complex parameter. (See
+also "print intervals".) Each ortholine is then specified by giving
+the complex distance between the geodesics at its ends, follwed by two
+pairs, integer:complex. The integer specifies which geodesic the
+ortholine ends at and the complex number gives the position of the
+ortholine in the link of that geodesic.
+
+This function also prints a conjugacy word for each ortholine running
+from a geodesic to itself. This maps the geodesic onto a conjugate at
+the given orthodistance and position. Cf. "evaluate orthodistance". 
+
+. ortholines <cutoff> <g1> [.. <gn>]
+
+Does what "print ortholines" does, with the exception that it does not
+compute any conugacy words. It uses a different method which is
+generally faster. Unfortunately it also has a bug which often causes
+duplicate ortholines to appear.
+
+. print k <cutoff> <g1> [.. <gn>]
+
+See "print ortholines". For each ortholine there is an associated
+quadratic surface, equidistant from the two geodesics in question.
+Normalized in the Klein model, the equation of such a surface takes
+the form z = k.x.y. This function prints out k for each orthodistance
+in the ortholength spectrum of the given list of geodesics.
+
+. print traces <cutoff> <g_num>
+
+The information this prints is related to the ortholength spectrum of
+geodesic g_num to radius cutoff. Let h be the fundamental group
+element corresponding to geodesic g_num. This function prints tr^2(h),
+then for each conjugate g of h whose axis is within cutoff of that of
+h, it prints the trace of the commutator, tr([g,h]). In principle
+these elements could be computed exactly as elements of the trace
+field but currently this function only computes them numerically using
+a formula based on the complex length of the geodesic and the
+orthodistance to its nearby image. 
+
+. gv_save geodesics [<g1> .. <gn>]
+
+Saves a 3-D picture of a Dirichlet domain for the manifold in Geomview
+format, in the file "snap.gv". If geodesics have been computed
+(via the "print geodesics" command) then geodesic numbers may be
+specified after the command. In that case images of the geodesics are
+included in the saved picture. 
+
+. gv_save ortholines <g-num> <n-radii>
+
+Saves a 3-D picture of a Dirichlet domain and includes a picture of
+the specified geodesic g-num in red, and ortholines of that geodesic
+in green. Ortholine segments are grouped by real
+orthodistance. n-radii says how many groups of equal real
+orthodistance ortholines to include. !!The function seems to
+hang for any but the most trivial examples.!! 
+
+. print intervals <g-num>
+
+One way to get a "picture" of a geodesic is to look at how its lifts
+intersect with a single copy of the Dirichlet domain. This gives a
+collection of segments which glue together under the face
+identifications of the domain to form the closed geodesic. The
+geodesic is parametrized by arc length in a real interval and each
+segment is parametrized on a subinterval. (This parametrization is
+also used in "print ortholines", supplemented by a complex component
+parametrizing angle around the geodesic.) For each segment this
+function prints the endpoints of the geodesic containing it (as a pair
+of complex numbers), its parameter range, and a conjugacy. The latter
+is a word in the unsimplified fundamental group which maps the given
+geodesic onto one containing the segment.
+
+. print go_pairs <len-cutoff> <orthodist-cutoff>
+
+Diagnostic. For each geodesic of length less than the length cutoff
+and each orthodistance of the geodesic, less than the orthodistance
+cutoff, print a (length, orthodistance) pair. A non-empty set of
+ortholines is required internally by the "print symmetry group"
+function. 
+
+. 
+
+FAMILIES OF SIMPLE GEODESICS
+
+. sally g <gnum>
+. sally c
+. sally <cutoff>
+
+Test conditions discovered by Sally Kuhlmann for the manifold to
+contain infinitely many simple closed geodesics. Given a simple closed
+geodesic in the manifold we have to check two things: an arithmetic
+condition satisfied by the complex length of the geodesic and its
+smallest orthodistance (half of whose real part is the injectivity
+radius of the geodesic); and a geometric condition on a "spiraling"
+geodesic, one whose lift goes between opposite ends of two distinct
+nearest lifts of the closed geodesic. If these two conditions are
+satisfied the manifold should contain an infinite family of simple
+closed geodesics, obtained by taking multiples of the closed geodesic
+and its shortest ortholine. 
+
+The first form applies the test to geodesic gnum; the second form, to
+the core geodesic of a 1-cusped Dehn filled triangulation; the third
+form applies the test to all closed geodesics below the cutoff length. 
+
+. set sally verbosity <v-level>
+
+Determines how much output the "sally" function prints. The v-level
+should be an integer between 0 and 3. The default is 1. (There is no
+way to inspect this verbosity level since it is not printed by 
+"print settings".)
+
+. set sally save [y|n]
+
+Asks whether the user wants the results of each call of the "sally"
+function to be appended to the file "sally_results". This is useful
+if one wishes to run snap in batch mode to test a large number of
+manifolds. 
+
+.
+
+ARITHMETIC INVARIANTS
+
+. print fields
+
+Prints all the number fields which have been computed for this
+manifold. Each field is given by its (usually canonical) polynomial
+(a minimum polynomial for a primitive element), the signature of the
+field [num-real-places, num-complex-places], its discriminant, and a
+number identifying which root of the polynomial generates the field in
+question. A slightly longer format is available by first calling the
+function "toggle field_print_style". (In the longer format fields for
+which a canonical polynomial and root have been computed are
+identified as such.) See "compute <field-name>" for a very brief
+description of each of the fields printed by this function. 
+
+. compute invariant_trace_field
+. compute trace_field
+. compute shape_field
+. compute group_field
+. compute cusp_fields
+
+Each of these functions computes one of the algebraic number fields
+associated with the current manifold. See "compute fields" for
+generalities on how these fields are actually computed. The trace
+field and invariant trace field are relatively well known. The shape
+field is the number field generated by the tetrahedral shape
+parameters of the ideal triangulation of the current manifold. For a
+complete hyperbolic structure (all cusps complete), this coincides
+with the invariant trace field of the manifold. When cusps are filled
+it may be larger (and is no longer an invariant of the manifold). The
+group field is a field containing all the coefficients of a set of
+SL(2,C) matrices generating the fundamental group of the
+manifold. Clearly this field contains the trace field. It is not an
+invariant of the manifold since it depends on which conjugate of the
+fundamental group is used: in snap we use the group generated by face
+pairings of an ideal fundamental polyhedron having three of its
+vertices at 0, 1 and infinity. The cusp fields are the fields
+generated by the cusp shapes (moduli of the euclidean tori which form
+the horospherical cross sections of the cusps). The set of cusp fields
+is a commensurability invariant of the manifold.
+
+. compute fields
+
+Computes the various number fields associated with a hyperbolic
+3-manifold. This is an interactive version of "compute <field-name>"
+which prompts for each field in turn. An appropriate set of generators
+for each field is computed to high precision (see "set precision") and
+then plugged into the LLL algorithm in order to find a polynomial
+which each satisfies.  The maximum degree of polynomial (and therefore
+of field) which can be found is 16 by default. It can be changed using
+"set degree" but the higher the maximum degree, the longer these
+functions will take.  Furthermore, in order for the computation to be
+successful the precision should be (at least) around 3 times the
+degree. See the paper "Computing arithmetic invariants of 3-manifolds,"
+for a more detailed discussion of this point. A suitable polynomial is
+then selected and replaced, either by a reduced polynomial (one with
+smaller coefficients) or by a canonical reduced polynomial, one of
+whose roots generates the same field. Finding a canonical polynomial
+may take longer than simply finding a reduced polynomial. (The
+decision as to which is done is controlled by "set
+canonical_poly_mode".)
+
+.  
+
+Canonical field descriptions are given as follows. All reduced
+polynomials, with roots generating the field, which minimize the
+so-called T2 norm, are listed. They are sorted by absolute value of
+the discriminant, absolute value of each coefficient (higher power
+coefficients taking higher priority), and finally by the signs of
+their coefficients if everything else agrees. Thus x^2 - x + 1 comes
+before x^2 + x + 1. The first polynomial in this ordering gives a
+canonical polynomial for the abstract algebraic number field.
+
+Since the fields we are interested in are subfields of the complex
+numbers we also have to somehow specify which subfield. Corresponding
+to each root of the canonical polynomial is an embedding of the
+abstract field into C. One or more of these embeddings will map onto
+the required subfield. We sort the roots into a fixed order, and then
+take the first root in that order which gives the required
+subfield. The order is real roots first, in order of increasing real
+part, then (conjugate) pairs of complex roots, in order of increasing
+real part followed by increasing absolute value of the imaginary part.
+Conjugate pairs are ordered so that the element with positive
+imaginary part comes first. Thus for x^3 + 2*x - 1, the order of the
+roots is [0.4533976, -0.226698+1.46771*I, -0.226698-1.46771*I].
+Roots are numbered, 1-r1, for the real roots, r1+1 - r1+r2 for the
+complex roots having positive imaginary part, and the negatives of the
+latter for their complex conjugates. So for the above example the
+roots would be numbered [1, 2, -2]. A completely canonical description
+therefore of the subfield of C generated by -0.226698+1.46771*I is 
+"polynomial: x^3 + 2*x - 1, root number: 2". 
+
+. load_fields
+
+!! Disabled !!
+If fields have previously been saved, this function will almost
+certainly be quicker than "compute ...field(s)". Depending on the
+filling status of the current manifold (see "save fields") snap
+selects one of the file names "closed.fields", "cusped.fields" or
+"other.fields". It then scans ALL files having that name in the path
+(see "set path"). It loads field information from the first file in
+which it finds an entry for the current manifold. This allows the user
+to save and reload their own field information while still having
+access to precomputed fields (distributed with snap). 
+
+. save fields
+
+!! Disabled !!
+Currently snap's most time consuming operation is computing the number
+fields associated with a 3-manifold. This function, and its partner
+"load_fields", exist so as to avoid having to repeat the operation.
+The function prompts the user for a file name, which is
+"closed.fields" if all cusps are filled, "cusped.fields" if all cusps
+are complete, and "other.fields" otherwise. These are the file names
+snap searches for when loading fields; if you choose another file
+name, or rename the output file, snap will not find it. 
+
+. gp_save_field <field> <filename>
+
+Saves field information in the format used by Pari-GP, where <field>
+is one of "invariant", "trace", "shape" or "group_coeff". (There is no
+default filename.)
+
+. print invariants
+
+Prints the high-precision volume, Chern-Simons and, if known, eta
+invariant of the manifold followed by all known arithmetic invariants,
+if any have been computed. See "print arithmetic" for a description of
+these.
+
+. print arithmetic
+
+Prints the invariant trace field, invariant quaternion algebra, and
+Borel regulator of the manifold, along with whether or not the
+fundamental group has (algebraic) integer traces and whether or not it
+is arithmetic. The invariant trace field must have been computed (or
+loaded) for this function to work. The Borel regulator is only
+computed if the shape field is known.
+
+. print borel_regulator [<field>]
+
+This is a list of volumes for the manifold associated with the various
+possible non-real embeddings of the invariant trace field of a
+manifold into the complex numbers. It gives a complete cut-and-paste
+invariant for the manifold called the Bloch invariant. To actually
+compute the volumes we have to know the shape field as well. Then for
+each embedding of the invariant trace field we find an embedding of
+the shape field which induces it. The images of the tetrahedron shapes
+give a set of volumes (negative if the shape is in the lower half
+plane) which we sum to give an entry of the regulator. 
+
+If two manifolds have different invariant trace fields, their Bloch
+invariants may still coincide. To find this out we must compute the
+Borel regulator using a field which contains both invariant trace
+fields. This function prompts for a field to use which need not be an
+extension of the current invariant trace field: if it is not, it first
+computes the join of the two fields. If no field is supplied it simply
+uses the invariant trace field of the manifold. 
+
+. print eigenvalue_fields <max_length>
+. print units <max_length>
+
+Runs through the list of complex lengths produced by "print
+length_spectrum" computing an "invariant eigenvalue field" (IEF) for
+each one. The IEF is the field generated by the eigenvalues of an
+SL(2,C) matrix for the square of the group element giving rise to the
+geodesic. Generically these fields are index two subalgebras of the
+invariant quaternion algebra. The full (presumably infinite) set of
+such fields should be a commensurability invariant of the manifold.
+"print units", in addition to printing the information given by "print
+eigenvalue_fields", also calls a Pari function to compute a set of
+fundamental units for each IEF and prints the generating eigenvalue in
+terms of this basis. 
+
+.
+
+CUSPED MANIFOLD COMMENSURABILITY AND COMMENSURATORS
+
+. print cusp density
+
+Prints the fraction of the total volume of the manifold taken up by a
+set of equal volume horoballs centered at the cusps of the manifold
+and expanded until they first become tangent. For 1-cusped manifolds,
+and manifolds on which the isometry group acts transitively on the
+cusps, this is a (fairly sensitive) commensurability invariant.  For a
+related commensurability invariant of multi-cusped manifolds, see
+"print cusp volumes".
+
+. print cusp volumes <volume ratios>
+
+Prints the volumes of a set of maximal horoball neighborhoods of the
+cusps of the manifold and the fraction of its total volume that they
+represent. The horoballs are obtained as follows. Initially a set of
+disjoint horoballs are chosen with a volumes in the chosen ratios.
+They are then expanded at equal speed until they bump. Any un-bumped
+horoballs are further expanded until they too bump, and this step is
+repeated until all horoballs are touching. Thus, even with an argument
+of 1:..:1 (or simply 1) this function differs from "print cusp
+density" which stops at the first tangency is encountered. The
+bumping order is printed with ',' separating cusps which bumped
+simultaneously and '|' separating sequential bumpings.
+
+To obtain a commensurability invariant of cusped non-arithmetic
+manifolds, use "find commensurator" to compute a volume ratio that
+gives equal volume horoballs in the commensurator.
+
+. print cusp invariant
+
+See "print cusp commensurability" for finding commensurability classes
+of cusp shapes in a given manifold. 
+ 
+Prints an (experimental) commensurability invariant of the cusps of a
+cusped hyperbolic 3-manifold. This is really an invariant of the
+commensurability class of a torus with an algebraic shape (modulus). 
+Assuming the field generated by a cusp shape is at least degree 4, the
+invariant is the cross-ratio of 4 embeddings of the shape into the
+complex numbers. Since commensurable cusps have shapes related by
+rational fractional linear transformations, and these preserve
+cross-ratio and commute with the field embeddings, it follows that
+this is a commensurability invariant. It ought to be a slight
+refinement of the set of cusp fields but seems nowhere near as useful
+as the cusp density (see "print cusp density"). 
+
+. print cusp commensurability
+
+Two oriented Euclidean tori will be commensurable (up to scale) if
+their complex shape parameters, z, z' are related by a fractional
+linear transformation in GL(2,Q). This will be so if and only if 
+{1, z, z', zz'} are Z-linearly dependent. If the shape field is known,
+this can be tested definitively; if unknown, the LLL algorithm is used
+to find a linear dependence -- if none is found the shapes are deemed
+to be incommensurable -- if one is found but any of the coefficients
+are greater than 10,000 a warning is printed -- otherwise the shapes
+are deemed commensurable. To check for an orientation reversing
+commensurability we recheck, replacing z by its complex conjugate.
+In the event that the shape field is chiral (ie. does not equal its
+complex conjugate) this second check is suppressed. 
+
+The resulting set of commensurability classes is numbered from 0 and
+the classes of the cusps are printed as a vector of integers. 
+
+. find commensurator
+
+Computes the commensurator of a non-arithmetic cusped manifold. For a
+1-cusped manifold this is the symmetry group of the ideal tiling of
+H^3 induced by the canonical cell decomposition (see "canonize"). For
+multi-cusped manifolds, if no tilt polytope is present (see "compute
+tilt_polytope"), the full tilt polytope is computed and used to find a
+cell decomposition with maximal symmetry; otherwise a precomputed tilt
+polytope, which may have tied cusps, is used.
+
+Prints the index of the fundamental group in the commensurator and
+whether or not it includes orientation reversing elements; a vector
+indicating for each cusp of the manifold, which cusp of the
+commensurator quotient it covers (a.k.a. cusp hidden symmetry
+classes); and a cusp area ratio, which is the ratio of cusp areas
+covering equal area cusps in the commensurator (an integer multiple
+of which gives the covering degrees). Call "print hidden_symmetries"
+to see generators for the commensurator. 
+
+. print hidden_symmetries <area ratios>
+
+Computes the group of symmetries of the ideal tiling of H^3 induced by
+the canonical cell decomposition for the given area ratios (see
+"canonize").
+
+Prints a set of elements which, together with the fundamental group,
+generate the group, followed by the index of the manifold's
+fundamental group, whether there are orientation reversing
+symmetries, equivalence classes of the cusps under this group, and
+the area ratios of cusps covering equal area cusps in the quotient. 
+This need not be the same as area ratio used to call this function. 
+
+. brute_commensurator <N>|<N1>-<N2> <tie classes> <area ratios>
+
+Looks for hidden symmetries of the manifold by trying all possible
+integral area ratio vectors whose entries sum to N, or summing to all
+integers from N1 to N2. Each time the number of cusp hidden symmetry
+classes is reduced (i.e. new hidden symmetries are found) the relvant
+area ratio vector is printed out. On completion it reports the same
+information as "find commensurator," excepting of course that the
+group of hidden symmetries found will not necessarily be the full
+commensurator.
+
+If CHSC is [0,..,0] or agrees with the result of "print cusp
+commensurability" then the result is the commensurator. The result
+will also be the commensurator if we test all area vector sums up to
+(num_cusps-1) * volume/0.069. (0.069 is a lower bound for the volume
+of a cusped non-arithmetic orbifold.)
+
+We can also use <tie classes> and <area ratios> to restrict the
+search to ratio vectors in which tied cusps keep a fixed ratio. 
+E.g. "brute 4 [0,0,1,1] 1:2:1:3" tries 1:2:3:9, 2:4:2:6 and 3:6:1:3. 
+See "compute tilt_polytope" for how to use these arguments to search
+for hidden symmetries of a known quotient. 
+
+. compute tilt_polytope <cusp tie classes> <tied area ratios>
+
+The set of possible Ford spines of a cusped manifold is parametrized
+by the open (c-1)-simplex of area ratio vectors (up to projective
+equivalence), where c is the number of cusps. This subdivides into
+finitely many convex cells, one for each combinatorial type of spine
+(and corresponding ideal cell decomposition). The subdivision can be
+obtained by the projecting the faces of a certain c-dimensional convex
+polytope, in the positive quadrant of R^c, containing a neighborhood of
+the origin -- namely the tilt polytope. This function computes the
+tilt polytope and reports the number of (c-1)-faces not contained in
+a coordinate hyperplane. 
+
+We can also tie cusps together in a fixed area ratio and thus obtain
+a lower dimensional polytope -- c is now the number of cusp tie
+classes: e.g. "com til [0,1,0] 1:1:3" ties the first and third cusps
+together with area ratio 1 to 3. When the manifold has a quotient, we
+can set the tie classes to be the indices of the quotient image
+cusps, and set ratios to the covering degrees, to compute the tilt
+polytope of the quotient -- i.e. we can use the output from "print
+hidden_symmetries", "find commensurator" or "brute_commensurator". 
+
+Also, if we are using the tilt polytope to find the commensurator
+of a multi-cusped manifold with incommensurable cusps (see "print
+cusp commensurabilities") we can tie these in an arbitrary ratio:
+e.g. if "p cus com" gives [0,0,1,1] we can do "com til [0,1,0,2] 1". 
+
+To verify that a given quotient is the commensurator we have to use a
+tilt polytope of projective dimension (c-1), where (c-1) = 
+#(cusps in quotient) - #(cusp commens classes). 
+
+. print tilt_polytope
+
+Vertices of the polytope are numbered; boundary vertices (those in
+a coordinate hyperplane, other than the origin) are printed; top
+dimensional faces (not in a coordinate hyperplane) are printed. 
+
+To compute the set of faces of all dimension, of an abstract polytope
+represented in this way we simply compute all intersections of two or
+more top dimensional faces. The dimension of a general face is the
+maximum number of strict inclusions between it and a singleton
+subset. (All singletons should arise, and the length of any two chains
+of strict inclusion which cannot be refined should be the same.)
+
+Actually, since this function only prints the top dimensional non-
+boundary faces, the above will yeild only the non-boundary
+faces. These are in any case the ones corresponding to the various
+ideal cell decompositions. 
+
+. commensurable <n> <this area ratio> <other area ratio>
+
+Check if this manifold is commensurable with manifold <n>. The two
+manifolds are assumed to be non-arithmetic. The area ratios giving the
+commensurators of the two manifolds must be supplied, as computed by
+"find commensurator" or "brute_commensurator". 
+
+. test arithmetic
+. test -l arithmetic 
+
+Two arithmeticity tests which can be performed on a manifold without
+computing the invariant trace field. The first checks whether or not
+the traces squared appear to be imaginary quadratic integers: if so,
+then the manifold is arithmetic; if not and the manifold is cusped,
+then it is not arithmetic; if not and the manifold is closed the
+function reports that the traces are not quadratic integers -- the
+arithmeticity of the closed manifold is not determined. 
+
+The second test depends on finding a short geodesic (len < 0.9624..).
+Cusped arithmetic manifolds only admit a few possible geodesic
+lengths below this value so if a short geodesic is found which is not
+one of these lengths, the manifold is non-arithmetic. Otherwise the
+test is inconclusive. 
+
+When a manifold is arithmetic, the strongest verification will be
+provided by "compute invariant_trace_field" and "print arithmetic".
+
+. save tilt_polytope
+
+In the case of a projectively 2-dimensional tilt polytope, this
+function prints a PostScript file tilt.ps showing the subdivision of
+the triangle of projective cusp size vectors into combinatorial types
+of Ford spine/ideal cell decomposition. 
+
+. show tilt_matrix
+
+Diagnostic. Prints the normal vectors to the faces defining the
+region of R^c in which the current ideal triangulation has positive
+tilts. In the case of a 1-cusped manifold the numbers printed
+will all be non-negative if and only if the ideal triangulation is
+canonical (or a refinement of the canonical cell decomposition). 
+E.g. for m015() some negative numbers will appear until "canonize" is
+called. 
+
+. print -h symmetry action <area ratio> <gnum>
+
+This function shows the action of the hidden symmetry group on the
+named geodesic and all current geodesics whose real length is
+commensurable with it. As a first check the program conjugates a
+generator for this geodesic by each of the hidden symmetries and tries
+to find what power of the resulting element belongs to the
+fundamental group: this will be a list of integers, all 1 if there
+are no hidden symmetries. Then it prints a table showing the action
+of each hidden symmetry; a '?' indicates that the image geodesic was
+not found in the current list of geodesics, probably because it was
+too long. 
+
+The code is not yet very polished, hence picky about the order in
+which you do things. You must first call "canonize <area ratio>" to
+get it to choose generators using the correct cell decomposition. 
+Then do "print length 4" or whatever seems appropriate to get a big
+list of geodesics, before calling this function. 
+
+. 
+
+CLOSED MANIFOLD COMMENSURABILITY
+
+. geodesic symmetries <g1 ... gn>
+
+Attempts to find the symmetry group in H^3 of the full set of lifts of
+the list of geodesics supplied. If the manifold is non-arithmetic and
+the supplied geodesics cover a set of geodesics in the commensurator
+quotient then the result should be a list of symmetries giving the
+whole of the commensurator. 
+
+.
+
+CUSPS, DEHN SURGERY AND CORE GEODESICS
+
+. print cusp shapes
+
+Prints low precision cusp shapes. High precision and exact cusp shapes
+are available from the "print manifold" function. Note that these low
+precision cusp shapes agree with those produced by SnapPea whereas the
+high precision and exact shapes are their complex conjugates. The
+former correspond to viewing the cusp from the fat part of the
+manifold looking out, while the latter correspond to looking down the
+cusp from infinity. Only the latter are guaranteed to belong to the
+shape (= invariant trace) field.
+
+. surgery <m1> <l1> ... <mc> <lc>
+
+Does Dehn filling on cusps 1-c, where c is the number of cusps of the
+current manifold. Use 0 0 for any cusps which should remain unfilled
+(complete). The type of the resulting solution of the gluing equations
+is printed out (see "print solution_type"). 
+
+. 
+
+!! Not currently supported (for surgery function). !!
+(If isometries between this manifold and any other have been computed,
+the surgery will also be carried out on the isometric manifolds, if
+possible. See "isometry", "print isometries" and "clear isometries".)
+
+. cone_surgery <slope1> <order1> ... <slope c> <order c>
+
+Does Dehn surgery (see "surgery") with rational surgery coefficients.
+Each slope and order should be a rational number in lowest terms (or
+1/0 for a slope). The function does Dehn filling along curves with the
+given slopes, having multiplicity equal to the given orders. Thus
+integral orders give orbifolds, while orders of the form 1/n give cone
+angles 2*pi*n.
+
+. solve <CRV1> <holonomy1> ... <CRV c> <holonomy c>
+
+Does generalized Dehn surgery, finding a solution whose holonomies
+agree with those supplied. Holonomies are good parameters for Dehn
+surgery space in a neighborhood of the origin. Each CRV parameter
+should be m, l, me or le specifying whether the holonomy we wish to
+solve for is a meridian, longitude, exponential of meridian holonomy
+or exponential of longitude holonomy respectively. The holonomy
+parameters are complex numbers. 
+
+. clear surgery
+
+Undoes the effect of Dehn filling ("surgery") on all the cusps of the
+manifold. Computes the complete hyperbolic structure. 
+
+. print holonomies
+
+Prints the holonomies of the meridian and longitude and their
+exponentials, for each cusp. If the holonomies printed out are [u,v]
+and the current surgery is m, l then m*u + l*v == 2*pi*i should hold.
+
+. peripheral_curve <m> <l>
+. all_peripheral <cutoff>
+
+The peripheral_curve function prints information about the result of
+doing m,l Dehn filling on what is assumed to be a 1-cusped manifold;
+all_peripheral prints the same information for all peripheral curves
+whose normalized length is less than <cutoff>. 
+
+The information printed is: surgery coefficients, normalized
+peripheral curve length, length of peripheral curve on a maximal
+embedded horosphere; then if Dehn filling of this curve is successful
+it also prints the complex length of the resulting core geodesic,
+length/singularity index - which is an analytic function on surgery
+space, volume of filled manifold, drop in volume from cusped
+manifold; next three ratios saying how well the asmyptotic formulae for 
+length, volume change, and volume change estimated from the core
+length, agree with the actual length and volume; finally the likely 
+injectivity radius of the core geodesic (correct if the set of edges
+of the triangulation includes a shortest orthodistance for the core
+geodesic). 
+
+. print core length
+
+Prints the complex lengths of all core geodesics. !!This
+function doesn't seem to work properly for multi-cusped manifolds. The
+"find core" function gives correct information and more of it.!! 
+
+. find core <index>
+
+Given a Dehn filling description of a manifold it is not always
+obvious which geodesics in the listing given by "print geodesics"
+correspond to the core geodesics of the filled cusps. This function
+determines the axis of a suitable holonomy transformation at cusp
+<index> and works out which geodesic, if any, this is. It also prints
+the complex length of the specified core geodesic.
+
+. 
+
+CHANGING TRIANGULATION
+
+. canonize <area ratios>
+
+Replaces the triangulation of the current manifold with the canonical
+triangulation dual to the Ford spine obtained by expanding horoball
+neigborhoods of the cusps which initially have areas (or equivalently
+volumes) in the given ratio. Ratios are specified in the form
+a1:..:ac, with any omitted areas defaulting to 1. Thus 1:..:1 and 
+1 are equivalent. No ratio is required if the manifold is 1-cusped. 
+
+If a tilt polytope has been computed ("compute tilt_polytope") the area
+ratios can also be specified as "-t (v1 ... vn)", where (v1 ... vn)
+is a non-boundary face of the polytope. See "print tilt_polytope" for
+how to determine all such faces. 
+
+. randomize
+
+Replaces the triangulation of the current manifold with a ranomized
+equivalent triangulation. This simply calls the SnapPea randomize function. 
+
+. simplify
+
+Attempts to simplify the triangulation of the current manifold. This
+just calls the SnapPea simplify function. 
+
+. fill
+
+Takes a p-cusped manifold of which q < p cusps have been filled and
+finds a triangulation for the p-q cusped manifold.
+
+. 
+
+WHICH MANIFOLD IS THIS?
+
+. identify
+
+Attempts to locate the current manifold (which should have unfilled
+cusps) in the cusped census.
+
+. drill standard <n>
+
+Loads a set of "standard" manifolds, and then attempts to find a
+drilling of the current manifold which belongs to the standard set. 
+It then loads the appropriate standard manifold as manifold number n,
+and fills it so that it is isometric to the original manifold (which is
+not actually changed).  The standard set is a set of manifolds, found
+by Jeff Weeks, from which, by suitable Dehn filling, almost every
+manifold in the closed 5, 6 and 7 censi can be obtained. These have
+names like "tr2.0", which is the first standard manifold having two
+cusps. They range from 1 to 8 cusps, and have volumes up to 24.0922. 
+This function only works for cusped manifolds.
+
+. check two_bridge
+
+Calls SnapPea code to try to determine if the manifold is a two-bridge
+(i.e. rational) knot or link complement. If so it prints the appropriate
+fraction. 
+
+.
+
+SMALL ADJUSTMENTS
+
+. reorient
+
+Reverses the orientation of the manifold. 
+
+. change curves [[a,b;c,d],...]
+
+The argument to this function is a (Pari format) row of 2 by 2
+matrices. There should be exactly as many of these as the current
+manifold has cusps, and each should be an integer matrix with
+determinant one. The effect of this function is to apply the given
+changes of basis to the meridian and longitude curves on each cusp.
+The surgery coordinates of any filled cusps may be changed by this
+function but the underlying manifold and triangulation are not. The
+eta "invariant" of a cusped manifold is dependent upon a choice
+meridian and longitude curves so this may change. (It should not
+change if only filled cusps are changed.)
+
+. standardize curves <n>
+
+Changes the peripheral curves of this manifold so as to agree with
+those of manifold n which is assumed to be isometric with this one. 
+
+.
+
+!! Old version -- may go back to it? !!
+Calls "change curves" on each manifold isometric to the current one
+(see "print isometries"), so that the cusp identifications are all
+given by the identity matrix. Ie. the isometry between this manifold
+and each of those to which it is known to be isometric, carries
+meridian curves to meridian curves and longitudes to longitudes. One
+useful side effect of this function is that the eta "invariants" of
+isometric cusped manifolds are made to coincide. 
+
+.
+
+SYMMETRIES AND ISOMETRIES
+
+. snappea symmetry_group
+
+Calls SnapPea functions to determine some information about the
+symmetry group of the manifold. 
+
+. print symmetry group
+
+Computes the symmetry group of the current manifold using a different
+algorithm from the SnapPea algorithm. Candidate symmetries are
+computed by computing part of the ortholength spectrum of a set of
+equal length geodesics in the manifold and computing isometries which
+carry one ortholine segment to another such that the geodesics at the
+ends also match. Each candidate is then tested by conjugating 
+generators for the fundamental group by the candiate and testing if
+the result is still in the fundamental group. Testing if a given
+isometry belongs to the fundamental group is done by a "Dirichlet
+normalization algorithm". 
+
+The multiplication table of the symmetry group is then printed out
+together with information from a call to a SnapPea function which
+attempts to recognize certain commonly occurring groups. 
+
+. print symmetry matrices
+
+Prints a set of matrices giving symmetries of the manifold. These are
+SL(2,C) matrices which normalize the fundamental group, as generated
+by the matrices given by "print manifold". 
+
+. print symmetry info
+
+In addition to the matrices as printed by "print symmetry matrices"
+this function prints the order of the element in the symmetry group,
+the element of the fundamental group one obtains by taking that power
+of the symmetry matrix, and in cases where the symmetry was not
+an elliptic isometry, further information about that fundamental
+group element. 
+
+. print number symmetries
+
+Prints the number of symmetries that "print symmetry group" would
+find, but no other information. 
+
+. save symmetry_group
+
+Saves a file readable by SnapPea giving matrix generators for the
+quotient of the manifold by its symmetry group. 
+
+. print symmetry orbits <max_length>
+
+Computes the symmetries of the current manifold and prints geodesics
+grouped together into orbits under the action of the symmetry
+group. For each orbit we print the complex length of a geodesic,
+enough of its ortholength spectrum to distinguish it from geodesics of
+the same length in other orbits, and a list of all the geodesics in
+that orbit. The list is sorted by length and ortholengths. I am making
+the unproven assumption that geodesics in different orbits are
+distinguished by their ortholength spectra.
+
+Warning: if a geodesic is very short it may be time consuming to
+compute its ortholength spectrum.
+
+. orbit number <g-num>
+
+Prints the symmetry group orbit number of the given geodesic. See
+"print symmetry orbits". 
+
+. print orbit <orbit-num>
+
+Prints the details of the given orbit of geodesics in the manifold
+under the action of the symmetry group. See "print symmetry orbits". 
+May be useful if the latter function stalls because of a short
+geodesic. 
+
+. print symmetry action
+
+Gives the details of how the symmetries of the manifold act on a set
+of equal length geodesics. This is given as a multiplication table
+with geodesics on the left and symmetries across the top. The entry is
+the image geodesic, prefixed with a '-' sign if its orientation was
+reversed. 
+
+. snappea isometry <n>
+
+Computes an isometry, if possible, between the current manifold and
+manifold number n. If one is found, and the manifolds are cusped, it
+prints the cusp mapping of the isometry.
+
+. isometry <n>
+
+Check if this and manifold n are isometric. Geodesics and ortholine
+segments are used to compute isometries of H^3 covering possible
+isometries of the manifolds. Each isometry is checked to see if it
+conjugates the generators of one fundamental group into elements of
+the other. If volumes also agree, the fundamental groups are
+conjugate. [Of course to be certain of the result we have to know that
+the manifold is hyperbolic and that the 'fundamental group' correct.]
+See also the faster and more rigorous "snappea isometry". 
+
+. 
+
+!! Old version of "isometry" function. !!
+On success the function returns silently. Otherwise
+it prints a message saying that the manifolds are not isometric.  The
+function "print isometries" prints all the manifolds to which the
+current manifold is known to be isometric. 
+
+When Dehn surgery is carried out on one of a set of isometric
+manifolds, the same surgery is carried out, if possible, on each
+manifold in the set. (When it is possible on some but not others, the
+set splits into two.) When is it not possible? An isometry between
+cusped manifolds creates identifications between the cusps of the two
+manifolds. Each manifold may also have other cusps which have already
+been filled. Any surgery on the identified cusps can be carried out in
+parallel on both manifolds. For surgery on one of the already-filled
+cusps of one manifold to be carried out on the other, it would be
+necessary to first drill out the geodesic corresponding to the core
+geodesic in the first manifold.  We do not attempt any such delicate
+operation.
+
+. 
+
+SHAPES AND GLUING EQUATIONS
+
+. print solution_type
+
+Prints the type of the solution SnapPea found for the gluing equations
+of the triangulation. The four most common are: "geometric" - meaning
+the manifold can be constructed by gluing ideal simplices;
+"nongeometric" - meaning the triangulation is a degree one ideal
+triangulation of the manifold containing one or more negatively
+oriented simplices; "flat" - meaning all tetrahedra are ideal
+quadrilaterals (so the fundamental group is Fuchsian); "degenerate" -
+some of the tetrahedra have two or more vertices coincident. 
+
+. print shapes
+. print log_shapes
+. print accurate shapes
+. print accurate log_shapes
+. print exact shapes
+
+Prints tetrahedral shape parameters for the ideal triangulation to the
+current precision. The snappea version prints shapes, computed by
+SnapPea, as double precision floating point numbers. If the shape
+field is known, the exact version prints the shapes as polynomials in
+a generator for the shape field followed by the shape field itself. 
+
+The shape parameter of an ideal tetrahedron is the cross ratio of its
+vertices (as points on the Riemann sphere). The log shapes (logarithms
+of the shape parameters) may be regarded as complex dihedral angles of
+certain edges. For each shape z we give TWO log shapes, log(z) and
+log(1-z). These are analytically continued as the shapes vary under
+Dehn surgery. The shapes log(z1),...,log(zn) are given first followed
+by log(1-z1),...,log(1-zn), where n is the number of tetrahedra and zi
+is the i'th shape parameter.
+
+. print all shapes
+
+See also "print shapes". For each tetrahedron there are three
+possible shape parameters depending on a choice of edge (with
+opposite edges having the same parameter). This function prints all
+three parameters for each tetrahedron. 
+
+. print histories
+
+When Dehn surgery is carried out on an ideal triangulation, tetrahedra
+may turn inside out (become negatively oriented). With repeated
+surgeries a tetrahedron may even change orientation several times. Its
+shape parameter can be regarded as the position of the fourth vertex
+after a Moebius transformation has been applied to normalize the first
+three to 0, 1 and infinity. Each time it changes orientation, the
+fourth vertex crosses the real line. The analytic continuations of the
+log shapes depend on where the fourth vertex crosses the line, whether
+it is in (-real_infinity,0), (0,1) or (1,+real_infinity).
+Equivalently they depend on which dihedral angle of the tetrahedron
+passes throught pi. SnapPea keeps shape histories for each tetrahedron
+saying how many times it changed orientation, and which edge had angle
+pi when it did so. This function prints the shapes followed by their
+lists of edge inversions. Edges are numbered 0 for the edge
+(0,infinity), 1 for (1,infinity) and 2 for (z, infinity) where z is
+the shape. Thus 0 corresponds to crossing (-real_infinity,0), 1 to
+crossing (1,+real_infinity), and 2 to crossing (0,1).
+
+. print tetrahedra
+
+Prints the tetrahedra positioned so as to form a fundamental domain
+for the manifold. Tetrahedron 0 should have vertices at 0, 1 and
+infinity.
+
+Each face is also labelled: the i'th label corresponds to the face
+opposite the i'th vertex. A label is 0 if the face coincides with a
+face of another tetrahedron in the fundamental domain. Otherwise it is
+the letter denoting the face pairing in the unsimplified fundamental
+group. See also "print domain". 
+
+. print domain
+
+Prints an ideal polyhedral fundamental domain for the manifold as per
+"print tetrahedra", followed by the images of the domain tetrahedra
+under each face pairing transformations.
+
+. print gluing_equations
+
+Prints the gluing equations for the complete hyperbolic structure on
+the manifold. Each row, times the vector of logarithmic shape
+parameters (see "print log_shapes") extended at the end with pi*i,
+should equal zero. The cusp equations list meridians followed by
+longitues. See also "print filling_equations" and "verify approximate".
+
+. print filling_equations
+
+Prints the gluing equations for the current Dehn filling structure on
+the manifold. Each row, times the vector of logarithmic shape
+parameters (see "print log_shapes") extended at the end with pi*i,
+should equal zero. See also "verify approximate".
+
+. print -p gluing_equations
+. print -p filling_equations
+
+These print the same information as "print gluing_equations" and 
+"print filling_equations" except that they are printed as polynomials
+in a format suitable for input to a Groebner basis solver such as
+Magma's. 
+
+. print full_equations
+
+An alternative format for print "gluing_equations". Each edge
+equation, times a vector of logarithmic shape parameters given in 
+the form [log(z1),log(1/(1-z1)),log(1-1/z1),log(z2),.. ] should 
+equal 2*pi*i. Each cusp equation times the same vector (at the 
+complete structure) should equal zero. 
+
+. print -pari filling_equations
+. print -pari gluing_equations
+
+See "print filling_equations" and "print gluing_equations". These
+functions print their output in the form of a matrix suitable for
+pasting into the Pari-GP calculator.
+
+. verify approximate
+
+Checks the gluing equations for the current Dehn filling using
+SnapPea's (ordinary double-precision) log-shapes. See "print
+filling_equations". 
+
+. verify exact
+
+Checks that the gluing equations of the current manifold are
+satisfied, using exact (rather than floating point) arithmetic in the
+shape field. This adds an additional degree of rigor to SnapPea's
+claim that it has found a hyperbolic structure for the manifold, as
+well as providing a check that the shape field itself is correct.
+Each gluing equation takes the form of a product of powers of the
+shapes z0,..., powers of (1-z0),... and some power of -1, equals 1.
+Eg. z0^2.z1^(-1).(1-z0)^(-1).(1-z1)^2.(-1)^0 = 1 is written as "2, -1;
+-1, 2; 0". This is followed by "->" and the result of the computation
+in the shape field. Separated from that by a ":" is the error in the
+corresponding logarithmic gluing equation using the accurate
+log-shapes (accurate to the current precision). Logically these are
+needed since a solution of the gluing equations could fail to be a
+solution of the logarithmic gluing equations by a multiple of
+2*pi*i. The function also prints exact expressions for the shapes, as
+polynomials in the generating element of the shape field. Following
+each exact shape is the difference between the value of the exact
+expression, with the generating element substituted, and snap's
+accurate numeric shapes (also printed). If the group field is known,
+relations in the fundamental group generators are checked too. 
+
+If you want to see what this function prints out when the verification
+fails, save the fields for some manifold, edit the line starting "TS:"
+(for tetrahedron shapes) in the appropriate *.fields file, and fool
+snap into using the incorrect shapes by calling "load_fields". (Then
+delete the corrupted entry!!)
+
+. print flattening 
+
+A flattening is essentially an integer solution to the gluing
+equations: append a 1 and its dot product with the gluing equations
+should be zero. This function also prints the result of the
+aforementioned dot products which should be a vector of #tetrahedra +
+2 * #cusps zeros. The flattening is an essential ingredient in the
+Chern Simons and Eta invariant computations. 
+
+. 
+
+FUNDAMENTAL GROUP
+
+. print group
+
+Prints a presentation of the fundamental group of the manifold. By
+default this is simplified so as to minimize the number of
+generators. Do "set simplify n" first in order to see the
+unsimplified group. (You can redo the current surgery in order to
+force the group to be recomputed from the triangulation.) The
+generators of the unsimplified fundamental group come from face
+pairings of a fundamental domain consisting of ideal tetrahedra: see
+"print tetrahedra".
+
+. set simplify [yes|no]
+
+Determines whether snap should always simplify the fundamental group
+when computing it from a Triangulation. By default it does. A few
+functions need the unsimplified fundamental group. When called they
+will print "Switching to unsimplified fundamental group", and this
+will remain in effect until the user next does "set simplified y". 
+
+. evaluate exact <word/g-num>
+
+Evaluates a word in the fundamental group as an SL(2,C) matrix with
+entries in the group field. (In order to use this function you must
+first compute the group field: see "compute group_field". The "print
+manifold" function then gives exact matrices for the fundamental group
+generators.) This function solves the word problem in the fundamental
+group by giving +/- the identity matrix if and only if the word
+represents the identity element. 
+
+. evaluate word <word/g-num>
+
+Word should be a word in the generators of the fundamental group or a
+geodesic number. Inverses of generators are given by capital
+letters. Do "print group" to see a presentation of the fundamental
+group.
+
+Evaluate prints an SL(2,C) matrix for the element of the fundamental
+group given by the word. It also prints a complex length 
+( = exponential of an eigenvalue) and fixed points. If the
+transformation is loxodromic it then attempts to identify the axis in
+the current list of geodesics. If successful it prints the geodesic
+number, a conjugating element (. for the identity) and what power of
+the element giving the listed geodesic this word is conjugate to. 
+
+. evaluate orthodistance <word1/g-num> <word2/g-num>
+
+This computes the axis of the element corresponding to the first word,
+then computes the orthodistance between this and its image under the
+action of the group element given by the second word. Thus if we
+supply a geodesic number and one of the conjugacies listed in its
+ortholength spectrum, we recompute the relevant orthodistance.
+
+. evaluate trace <word/g-num>
+
+Word should be a word in the generators of the unsimplified
+fundamental group or a geodesic number. Prints the exact trace of the
+group element as an element of the trace field which must be computed
+first. See also "evaluate exact unsimplified". 
+
+. normalize <word-list> 
+
+Computes the fixed points of as many of the words supplied in 
+word-list as are needed to get three distinct points. (If not enough
+elements are supplied it generates more itself.) It then conjugates
+the group so that those three points become 0, infinity and 1
+respectively. 
+
+. symmetry <n>
+
+In principle we can work with orbifolds as well as manifolds if we
+are only working with the fundamental group and Dirichlet domains.
+This function is a first attempt to allow us to create orbifolds by 
+computing the quotient of the given manifold by one of its symmetries. 
+This adds symmetry <n> to the set of generators of the fundamental 
+group and adds extra relations as well. Currently most of the code 
+which uses Dirichlet domains does not work well when the group 
+contains torsion elements. 
+
+. 
+
+ETA INVARIANT FUNCTIONS
+
+. print eta invariant
+. print eta fudge
+. print eta difference
+
+The eta invariant of a 3-manifold is a real valued extension of the
+Chern-Simons invariant. The "fudge" is a constant (an integer multiple
+of 1/18) depending on a triangulation and choice of peripheral curves
+for the cusped 3-manifold. To compute the eta invariant of a manifold
+we need to know its fudge or vice versa. The difference ("print eta
+difference") between these two values however we can compute without
+knowing either. Once the eta fudge (or invariant) of a triangulation
+is known we can find the eta invariant of all other fillings of the
+manifold. By equating the eta invariants of different surgery
+descriptions of the same closed manifold we can extend the set of
+manifolds for which the eta invariant is known. This is the
+"bootstrapping" method for computing the eta invariant. We can use the
+fact that orientation reversing isometries change the sign of the
+invariant to compute it in certain special cases (in particular when a
+closed manifold has an orientation reversing element in its isometry
+group).
+
+. bootstrap eta
+
+First proceeds as per "drill", finding if possible a filling of a
+manifold in the standard set which is isometric to the current
+manifold. (It stores this as n+1 if n is the number of the current
+manifold, or n-1 if n==10.) Then we set the eta fudge of the standard
+manifold, before changing its peripheral curves to agree, under the
+isometry, with those of the current manifold. (The operation of
+changing peripheral curves changes the eta fudge value.) Finally,
+using the surgery formula for the eta invariant, we can compute its
+value for the filled standard manifold. Since the latter is isometric
+with the current manifold, and moreover the isometry preserves
+peripheral curves, this gives us the eta invariant of the current
+manifold. 
+
+In cases where the isometry between the current manifold and the
+filled standard manifold is orientation reversing, we change curves
+such that longitudes agree and the isometry reverses the meridian
+curve. The eta invariant of the filled standard manifold will then be
+the negative of that of the current manifold. 
+
+. print eta information
+
+This is a diagnostic function. For the eta invariant and eta fudge it
+either prints the value, or it prints "not known". Surgery on a
+manifold changes the invariant but not the fudge. Operations which
+change the triangulation of a manifold change the fudge but not the
+invariant. For cusped manifolds the invariant depends on a choice of
+peripheral curves so if these are changed the invariant must be
+modified appropriately. After any such operation print eta information
+can be used to see which quantity is known for the resulting manifold.
+
+. set eta invariant
+. set eta fudge
+
+The eta invariant is a real valued extension of the Chern-Simons
+invariant. It is computed via a formula relating the eta invariants of
+different fillings of a cusped hyperbolic 3-manifold. The "fudge" is a
+constant (always an integer multiple of 1/18) depending on a
+triangulation and choice of peripheral curves for the cusped
+3-manifold. If we know either of these values for a given
+triangulation we can tell snap what it is using one of these
+functions, then print the other using "print eta invariant/fudge".
+
+. save eta_fudge
+
+Since SnapPea does not compute eta invariants, they are neither saved
+by the "save manifold" function, nor loaded by "read census/file".
+Therefore we provide an alternative method for saving and loading the
+"eta fudge" constant on which the eta invariant computation depends.
+The default file name to save to is "eta_fudges". Loading of eta
+fudges is done implicitly by "print eta invariant/fudge". When loading
+an eta fudge, ALL files called "eta_fudges" in the current path are
+scanned for the name of the current manifold. The eta fudge is taken
+from the first file in the path in which the name is found. This
+allows the user to save and reload their own eta invariant information
+while still having access to precomputed values (distributed with
+snap).
+
+. factor [a,b;c,d]
+
+The argument to this function is a (Pari format) 2 by 2 integer matrix
+which should have determinant 1. Prints a Pari row vector of matrices
+of the form [1,n;0,1], [0,1;-1,0] and [0,-1;1,0] where n is an
+integer. The product of these matrices in the given order should equal
+the input matrix. This computation is used in computing how the eta
+invariant of a cusped manifold is changed when the peripheral curves
+are changed. 
+
+. dedekind p q
+
+Print the Dedekind sum, dedekind(p,q), of the integers p and q.
+
+. adjustment 
+. print signature
+. check signature
+
+Diagnostics for eta invariant code. 
+
+. check eta
+
+Diagnostic for eta invariant code. Prints all the terms appearing in
+the eta difference formula. 
+
+. extend_fudge
+
+Disabled because the isometry list feature of snap has been removed.
+Set the eta fudges of all manifolds known to be isometric to the given
+one.
+
+. 
+
+MISCELLANEOUS
+
+. polish triangulation
+. polish group
+
+If you change the precision ("set precision") and wish to compute
+information for the current manifold using the new precision, you
+used to have to call a "polish" function. It should now be done
+automatically but, if in doubt, this function will try to improve the
+precision of a Triangulation or Group object. 
+
+. tile <tile-rad>
+
+Compute a partial tiling of H^3 by copies of the Dirichlet domain,
+starting with one centered at the origin, which includes all tiles 
+having center in the ball of radius <tile-rad>. 
+
+. print tile radius
+
+Print the current tiling radius. This will either be the minimum
+tiling radius required to rigorously process that last call to "print
+length_spectrum", "print ortholines" or similar function, or it will
+be the value supplied in the last call of "tile" (or zero).  
+
+. print number tiles
+
+Print the number of tiles in the current tiling. 
+
+. print manifold
+
+Prints generators for the fundamental group, tetrahedron shapes, cusp
+shapes, and the traces of enough elements to compute the trace field
+and invariant trace field. In other words it prints generators for the
+various fields snap knows about. Once any of these fields has been
+sucessfully computed, corresponding generators are given exactly as
+polymods in the appropriate field rather than numerically.
+
+.
+
+OBSCURE DIAGNOSTICS
+
+. check curves
+
+Checks if the peripheral curves of a SnapPea Triangulation are
+still in a consistent state (e.g. after operations which directly
+modify the Triangulation). 
+
+.
+
+DISABLED SIMULTANEOUS SURGERY CODE
+
+. print isometries
+
+Isometries between cusped manifolds can be created explicitly by the
+"isometry" command and implicitly by "drill". Part of any isometry
+between cusped manifolds is an identification of the cusps. 
+!! Not currently available. !! 
+
+. clear isometries
+
+Removes from the current manifold the list of other manifolds to which
+it is isometric. !!Not currently available.!!
+
+.
+
+CORE ORTHOLENGTH SPECTRUM (or INVARIANT)
+
+. print core ortholines
+
+For a 1-cusped manifold prints the set of ortholines which will be
+used to compute a core tube. Initially this corresponds to the set of
+edges of the ideal triangulation. See "print ortholines" for a
+description of the format in which ortholines are printed. The
+geodesic number is arbitrarily set to -2. To find out which geodesic
+the core geodesic actually is, use the "find_core" function.
+Holonomies and ortholines are analytically continued through
+Dehn surgery space. If this fails it may be necessary to call 
+"reset_holonomies". 
+
+. reset_holonomies
+
+Analytic continuation of holonomies may not always be successful.
+In this case the user has to do a fairly large Dehn surgery followed 
+by "reset_holonomies" to set the imaginary parts of the resulting
+holonomies close to zero. 
+
+. print core k
+
+Prints the k values (see "print k") for the ortholines of the core
+geodesic: see "print core ortholines". 
+
+. print edge orthodistances
+
+Prints out all the orthodistance and orthoangle information for the
+current triangulation, which should be a Dehn filled 1-cusped
+triangulation. 
+
+A cusp cross section of a 1-cusped ideal triangulation is a
+triangulated torus. If after Dehn filling we allow the edges of our
+triangulation to "pull tight" and become ortholines of the core
+geodesic, and the faces to distort in some way to follow the edges, we
+have a combinatorially equivalent linking triangulation for the core
+geodesic. The linking torus has a shape given by the holonomies of the
+surgery. Vertices correspond to ends of the ortholines and have well
+defined orthoangles, modulo the holonomies and some arbitrary additive
+constant.
+
+First the cosh-orthodistances and orthodistances of the edges are
+printed. Then for each triangle, given by (tet-num, vertex-num),
+the neighbouring triangles and vertex permutation, and vertices -- as
+edge ends -- are printed first, followed by three complex numbers,
+summing to zero, which are the relative orthoangles of the three
+edge-ends forming the vertices of this triangle.
+
+Finally, absolute orthoangles are given for all the edge-ends. The
+difference between two (adjacent) absolute edge-ends should be equal
+to the relative orthoangle between them, modulo some integer
+combination of the holonomies, which are printed last. 
+
+. print edge k
+
+Prints the k values (see "print k") for the ortholines of the core
+geodesic of a Dehn filled 1-cusped triangulation coming from the edges
+of the triangulation.
+
+. curve <m> <l>
+
+Prints information about the m,l curve on a maximal radius tube around
+the core geodesic. This assumes the manifold is 1-cusped. The function
+does not actually compute the tube. 
+
+. 
+
+About analytic continuation
+---------------------------
+
+Since ortholines are computed by taking logs of points in C-{0} there
+is an ambiguity about which branch should be chosen. When the angle,
+subtended at the core geodesic by all the translates in one
+fundamental domain for the linking torus, is small, all ortholines can
+readily be chosen on a "single" branch. 
+
+If we then perform further Dehn surgeries, moving towards points where
+the angle is larger, we should try to avoid jumping onto a different
+branch when we compute the ortholines. Snap attempts to do this by
+checking after each surgery whether the ortholines moved by more than
+0.5. If they did, it undoes the previous surgery in SnapPea, which
+hopefully returns us to the earlier set of tetrahedral parameters etc.
+(ie. not on some other branch or otherwise corrupt). It then does
+"half" the previous Dehn surgery (eg. going from 4.0 0.5 to 3.7 0.5
+instead of directly to 3.4 0.5). If this is OK it then does the other
+half. If not it goes back to where it failed and halves the step size
+again. After halving the step size 4 times it gives up. It also gives
+up if any backtracking surgery does not get us back to where we were.
+If it has to give up, for either reason, it will print the solution
+type as "not_attempted".
+
+When snap first computes ortholines it simply puts all their
+imaginary parts in the range +/- pi. Thereafter it changes them by
+analytic continuation, as described above, each time surgery is
+performed. It is therefore best to make snap compute the ortholines
+before going too far from the complete structure, eg. via the "print
+ortholines" command. Unfortunately snap can't (currently) compute
+the ortholines for the complete structure; therefore it is necessary
+to begin with some reasonable sized Dehn filling.
+.
+
+TUBE DOMAINS
+
+TUBE SETTINGS
+
+. set tube epsilon <value>
+
+When tube face pairings are checked, vertices no more than this
+distance apart are considered to match. Distances are computed in the
+natural coordinate system on the equidistant surfaces given by the
+ruling lines and running between -1 and 1 in each coordinate for a
+whole equidistant surface. 
+
+. set face epsilon <new_value>
+
+The faces of a tube consist of a collection of intervals, which are
+real quartic curves in the plane. These intervals should normally
+arrange themselves into loops. This epsilon controls when the
+endpoints of intervals are considered to match.  If the polynomials
+defining the intervals are badly conditioned it may be necessary to
+reduce the face epsilon slightly to obtain complete loops. (If the
+mismatch is significant it probably indicates a bug in the program
+rather than run of the mill roundoff error.)
+
+If there is a failure at any point in a tube computation of the
+intervals to form loops, the program terminates printing out a list of
+"clipping matrices" for the offending face. Each matrix is a 3x3 real
+matrix M_i encoding the polynomial f_i(x,y) = (1,y,y^2) M_i (1,x,x^2)^t. 
+The loops being computed are the boundary curves of the plane subset 
+{(x,y) | f_i(x,y) >= 0 for all i}. 
+
+. set edge epsilon
+
+The edges of a tube face are defined by degree 4 polynomials in two
+variables having degree at most 2 in each variable. When these are
+compared for equality or other numerical tests are done, this epsilon
+is used. It is printed in the settings as "Tube edge epsilon" and
+has a default value of 1e-6.
+
+. set ideal_vertex_cutoff <new_cutoff>
+
+Vertices of a tube domain are by default considered to be ideal if
+their distance from the core geodesic exceeds 10. Unfortunately this
+quantity is very suceptible to roundoff error and can easily drop
+below 10. This affects the output of the "print corners" function and
+causes "print drilling_info" and "drill tube" to fail. The tube around
+geodesic 2 in m004(,) is an example where we need to reduce the ideal
+vertex cutoff to about 8 to avoid problems. 
+
+. set gv_options <option_string>
+
+!!This controls the operation of "gv_save tube" which is
+currently not working.!!
+
+A subword of "-f[bt][pwo]" indicates which faces to save and how on a
+picture of the tube. A "b" says just show enough faces for one
+fundamental domain of the tube torus; a "t" says tile along the
+geodesic to show a reasonable portion of the tube. A "p" says show
+surfaces filled in (polyhedral); a "w" says show them wireframe; an
+"o" says to show only the boundaries (outline). (All combinations
+except "-fbo" are recognized.)
+
+A subword of "-Pbo" indicates that we also want to see other lifts of
+the tube. The lifts are shown with faces in outline tiled, along the
+tube. One lift is shown pairing with each face in a fundamental
+domain for the tube torus.  
+
+. set picture <option_string>
+
+Determines what is saved in the file ./tube.ps when the command "save
+picture" is given. Options should be a single word. It is read as a
+concatenation of shorter subwords, each preceeded by a "-": 
+eg. "-fbp-b" which is the default setting of print_options. 
+
+A subword which starts "-f" indicates that the faces of the tube
+domain (ie. portions of certain equidistant surfaces) should be
+displayed.  Following a "-f" the next letter should be either "b" or
+"t". A "b" indicates that faces should be shown for just one copy of
+the torus fundamental domain, the base copy. A "t" indicates that the
+faces should be shown tiling the plane (universal cover of the torus).
+Following the "b" or "t" there should be a "p" or an "o". A "p"
+indicates that faces should be shown as a filled colored polygons.
+Faces of the same color are paired. An "o" indicates that the faces
+are to be drawn in outline.
+
+There may be more than one subword starting "-f". Eg. "-fbp-fto"
+draws one fundamental domain's worth of faces, filled, in color, and
+tiles a portion of the plane around that with outlines of translates of
+the faces. 
+
+A subword of "-o" indicates that the ortholines responsible for each
+face should be shown (as dots).
+
+A subword of "-b" indicates that a box should be drawn equal to a
+fundamental region for the torus. 
+
+A subword of "-B" indicates that a large box should be drawn going
+from -4 to 4 in the x-direction, and -pi to pi, in the y-direction. 
+
+.
+
+The next two options apply to cusp tubes only. 
+
+A subword of "-t" indicates that the triangles arising from the ideal
+tetrahedra should be shown. Triangles are shown gluing together to
+form one fundamental domain for the cusp (or more precisely, the link
+of a core geodesic).
+
+A subword of "-r" indicates that the vertices of triangles used as
+representitives for vertices of the corresponding triangulation of the
+torus should be shown. This is mainly for debugging purposes. 
+
+. set stop count <number>
+
+!!Currently this is disabled.!!
+Sets the maximum number of real orthodistances used before giving up
+on a tube computation. Ortholines are listed in order of real
+orthodistance. 
+
+. set stop radius <r>
+
+!!Currently this is disabled.!!
+Sets a maximum on the real orthodistance of ortholines to consider
+when computing a tube. 
+
+.
+
+COMPUTING A TUBE
+
+. compute tube <geodesic_number>
+
+Attempts to compute a tube around the given geodesic. The function
+returns when a tube has been computed, a fatal error has occurred,
+more than a minute has elapsed, no more ortholines are available from
+the current tiling, or there is an unmatched vertex which cannot be
+removed by any ortholine available from the current tiling. 
+
+If successful it prints a count of the number of faces the tube
+has. Two kinds of fatal error are possible. The first is
+a loss of integrity of the tube faces: the problem and a possible cure
+for it are described in the help for the function "set face
+epsilon". The second definitive failure is if the tube ever contains
+an unmatched vertex which cannot be removed by any future ortholine.
+
+If the tube is incomplete but no fatal error has occurred the user may
+proceed in either of two ways. If the computation was stopped because
+it ran for more than a minute, one can simply continue from the
+point where it left off by repeating the "compute tube" command. If it
+runs out of ortholines or at least out of ortholines which can remove
+any currently unmatched vertices the user can increase the tiling
+radius before repeating the "compute tube" command. (In the latter
+case, if the tiling radius is not increased "compute tube" should
+return almost immediately.) See "tile" and "print tile radius". 
+
+. compute core tube
+
+Assumes the manifold has just one cusp and that this is currently Dehn
+filled. Real as well as integer Dehn fillings are allowable. The set
+of ortholines used is initially determined by the edges of the
+triangulation, and is printed out by "print core ortholines". This
+set may be modified using "add core word" and "delete core word",
+allowing the user to deform a tube through changes in combinatorics.
+
+. local core tube
+. check core_tube
+
+Try to compute a core tube using only the edges of the triangulation:
+the triangulation is first converted into a set of orthoangles and
+orthodistances from which the faces of the tube are computed. When the
+triangulation is dual to the tube around its core geodesic, each edge
+will be dual to a tube face and the cycle of faces around the edge
+will be dual to the sides of the tube face. If there is any mismatch
+it is because the triangulation is not dual to the core tube. This is
+reported as a "non-tubal triangulation".
+
+Typically if one begins with a canonical triangulation and fairly
+high order Dehn filling, this function will succeed. As one lowers
+the order of the Dehn filling the function will fail as soon as the
+combinatorics of the core tube change. At this point one could, in
+principle, modify the triangulation to restore duality, and then
+continue through surgery space. In fact a start has been made on 
+allowing one to modify the triangulation: see "split_edge".
+
+The only difference between these two functions is that the results of
+"check core_tube" are not kept. 
+
+. split_edge <e> <f1> <f2>
+
+When "check core_tube" reports that a triangulation is non-tubal it
+may sometimes be possible to modify the triangulation so as to make
+it tubal again by using this function. Specifically, if a face of the
+tube becomes pinched by two edges so that it splits into two components
+it should be possible to modify the triangulation by splitting the dual 
+edge and introducing a pair of cancellable tetrahedra between the two 
+faces dual to the colliding tube-face edges. Unfortunately this function
+seems to be still very buggy. There three other modifications we might
+want but they are not yet implements, namely cancelling a pair of 
+tetrahedra (which snap does automatically when it simplifies a triangulation) 
+and doing 2-3 and 3-2 moves, which correspond to simple whitehead moves
+in the tube.
+
+. add core word <word>
+. delete core word <word>
+
+Allows us to add to or delete words from the list of ortholines
+used in core tube computation and printed by "print core ortholines". 
+
+. add faces
+
+Has the same effect as calling "compute tube n" where n is the same as
+for the previous call of "compute tube". !!Originally this function
+was supposed to just do one more ortholine. It might be useful to
+reinstate the former functionality at some point.!! 
+
+. check face_pairings
+
+Checks to see if the current tube is complete, ie. if all the faces
+match up. Each face is a collection of intervals in an equidistant
+surface. Since the rulings of paired faces must always match it is
+only necessary to check if intervals match in the coordinates in which
+they are given. Actually the way in which coordinates are chosen means
+that the face pairing becomes (x,y) -> (-x,y). (This will be clear if
+you look at the output of "save natural_picture".) 
+
+If a pair of faces does not match a list of unmatched intervals is
+printed. Intervals can be parametrized either by the x or the y
+coordinate: if the interval is vertical or nearly so, the y coordinate
+is used, otherwise the default is the x coordinate. To make a plane
+curve into a collection of intervals parametrized over x, the curve
+must be subdivided at each point where it becomes vertical. Eg. the
+unit circle must be broken into two intervals by subdividing at (-1,0)
+and at (1,0). Since roundoff error can occasionally influence whether
+intervals are parametrized horizontally or vertically, the subdivision
+of intervals can sometimes differ between matching faces. Therefore,
+before comparing the sets of intervals of two faces, a common
+subdivision is found. 
+
+When faces do not match we are left with some unmatched vertices. If
+clipping by further equidistant surfaces is ever to give a tube 
+domain, there must be surfaces which remove these vertices. How these
+vertices help govern tube computation is discussed in "compute tube". 
+
+. check edge_matching
+
+Checks to see if the edges of the faces of a tube match with the
+edges of the faces they are supposed to be adjacent to. !!I'm not
+sure this function is working properly!! 
+
+.
+
+EXAMINING THE TUBE (GRAPHICALLY)
+
+. save picture
+
+Puts a picture of the tube domain, as seen in the universal cover of a
+torus linking the core geodesic, in the file "tube.ps". The
+x-direction (horizontal) is distance along the core geodesic. The
+y-direction is angle around it.  What is actually printed depends on
+the print_options string which is set by the command "set picture".
+
+. save face_picture
+
+!!Currently not working.!!
+For each face of the tube domain, snap prints the face in outline
+and the image of the paired face as a colored polygon. If there is any
+mismatch between the two faces this should show up. 
+
+. save natural_picture
+
+Saves the faces of the tube shown in their "natural" coordinates. Each
+face is part of an equidistant surface between two geodesics, and as
+such has rulings in two directions. These are mapped onto the x and y
+directions in save natural_picture.
+
+. save curve_picture
+
+!!Currently not working.!! 
+Was intended to show a picture of how a meridian or longitude curve
+passes through the faces of a tube domain. 
+
+. gv_save tube
+
+!!Currently not working.!!
+Saves a 3-dimensional picture of the tube in geomview format in the
+file "tube.gv". What is actually saved is controlled by the geomview
+picture options (see "print settings" and "set gv_options"). 
+
+.
+
+EXAMINING THE TUBE (PRINTOUTS)
+
+. tube info
+
+Prints the geodesic number of the current tube, the holonomies (which
+are two complex numbers spanning the same lattice as {complex-length,
+2*pi*i}), and the set of ortholines which gave rise to faces of the
+tube. 
+
+. print faces
+
+Prints the faces of the current tube. Each face is numbered and face
+2n pairs with face 2n+1. Each face is given as a list of
+intervals. The intervals form the boundary of the face and should link
+up to form loops. If the face has more than one connected component
+there will be more than one loop. Separate loops are printed with a
+blank line between them. The endpoints of the intervals are vertices
+of the tube and are given in the following coordinates.  [complex,
+real]: relative to the core geodesic of the tube, the complex
+coordinate specifies distance along the geodesic and angle around it
+in real and imaginary parts respectively. (This part of the coordinate
+system is the same as that used by the "print ortholines" function.)
+The real coordinate is simply the hyperbolic distance of the point
+from the core geodesic. Due to the limitations of machine precision
+arithmetic, points which are supposed to lie on the sphere at infinity
+can have a distance as low as around 6. (If the distance exceeds 20 it
+is printed as Infinity.)
+
+Along with each interval is printed the number of the adjacent face,
+then one of 0, +/-M, +/-L +/-M+/-L. Each interval is created when the
+face is cut off by the equidistant surface containing a neighboring
+face.  The tube computation is done (at least partially) in the
+universal cover of the link of the core geodesic. Therefore, as well
+as cutting off by surfaces arising from the ortholines themselves, we
+also cut off by meridian and longitude translates of those (ortholines
+and) surfaces.
+
+. print natural
+
+Prints the faces of the current tube. Prints the same information as
+"print faces", with the sole exception that endpoints of intervals are
+given in a different coordinate system. 
+
+Each face of a tube is part of an equidistant surface between two
+geodesics. Such surfaces are ruled by two sets of geodesics and these
+give a natural coordinate system for the surface in which both
+coordinates lie in the range (-1,1). In fact the surface can always be
+normalized to be a surface of the form z = kxy in the Klein model of
+H^3, and it is the x and y of this normalization which form the
+natural coordinate system of the surface. This function prints the
+endpoints of intervals as complex numbers whose real and imaginary
+parts are the natural coordinates of those points.
+
+. print connected_faces
+
+Prints the faces of the current tube (see "print faces"). Sometimes
+several faces of a tube may be part of the same equidistant surface. When
+this happens, the "print faces" command prints those faces as a single
+face with several connected components. This function separates out
+such faces and renumbers all the faces so that they run contiguously
+from 0. The numbering is again arranged such that faces 2n and 2n+1 are
+paired. The faces are no longer printed as lists of intervals but
+rather as lists of vertices running cyclically around the face. Each
+vertex is given in the same coordinate system as that used by "print
+faces". 
+
+Edges are labelled with the adjacent face and which universal cover
+translate of that face caused the edge to be generated (see "print
+faces"). In fact for each vertex we print the labels on both the
+incoming and the outgoing edges. 
+
+Separating the connected components of the faces of a tube is a
+necessary prelude to drilling out the core geodesic of the tube.
+
+. print corners
+
+Given a tube domain this gives a summary of the whole combinatorial
+setup. Each connected face of the tube (see "print
+connected_faces") is assigned an integer, and vertices are numbered
+cyclically around the face. First, for each face and partner pair, the
+vertex correspondence is given. Following that is an entry for each
+vertex of the tube domain: at each vertex several face corners come
+together. We list corners cyclically around the vertex, giving each one
+by a (face,vertex) pair. Ideal vertices are indicated by putting a '*'
+after each corner. Generically, 3 corners meet around each
+finite. Around ideal vertices, 6 is more likely. 
+
+The information returned by "print corners" is all that is needed in
+order to compute the cell complex given by "print drilling_info" and
+that in turn is sufficient to compute the drilled manifold ("drill
+tube"). 
+
+. print drilling_data
+
+Given a tube domain in an n-cusped manifold, more or less dual to that
+tube is an ideal cell decomposition of an n+1-cusped manifold which is
+topologically the original manifold minus the core geodesic of the
+tube. Whereas the "drill tube" function subdivides the cell
+decomposition into an ideal triangulation for the new manifold, this
+function simply prints out the cell decomposition. 
+
+To compute the cell decomposition, snap does the combinatorial
+equivalent of first truncating each ideal vertex of the tube and
+constructing another tube around each cusp. This gives a collection of
+solid tori (minus a core geodesic in every case but one) whose
+boundaries form a cell complex in the original manifold. The dual
+complex has an ideal vertex for each core geodesic, an infinite edge
+for each face, a 2-cell for each edge of the previous complex, and a
+cell for each vertex. 
+
+For each cell, faces and vertices are numbered contiguously from
+zero. For each cell we give each face as a face number followed by a
+list of vertices (in the order they appear around a face). We also
+give the face to which it glues as cell:face[vertices]. For example,
+(in cell 2 say), 1[0,2,3] -> 0:7[1,2,4] means that face 1 has vertices
+0, 2 and 3 and that these glue to vertices 1, 2 and 4 respectively of
+face 7 of cell 0.
+
+.
+
+GETTING A TRIANGULATION FROM A TUBE
+
+. drill tube <n>
+
+Computes the triangulation dual to the current tube, and saves it as
+manifold n. This function first computes a cell complex (see "print
+drilling_info"), then subdivides each cell into ideal tetrahedra to
+obtain an ideal triangulation for the drilled manifold. The first cusp
+of the drilled manifold is the one created by drilling. The Dehn
+filling coefficients required to recover the original manifold are
+also printed out.
+
+This function assumes that the cells all have only triangular
+faces. This is equivalent to assuming that each edge of the tube
+domain boudary (viewed as a 2-complex in the original manifold) has 3
+adjacent faces. Generically this is the case. Generically it is also
+the case that each vertex has six adjacent faces, and this corresponds
+to each cell being a tetrahedron. Exceptions to this are sufficiently
+common that we need to take account of them.
+
+Occasionally you will see the following error message:
+ There were too many vertices on a face (more than 15). 
+This seems always to be due to a failure of the program to recognize
+which vertices of the tube are ideal and which are not. This is a
+result of roundoff error whereby ideal vertices appear to lie at a
+distance of less than 10 from the core geodesic of a tube. The
+solution is to "print faces", check for vertices which look like they
+ought to be ideal but have distance less than 10 from the tube
+(distances as low as 6 are possible), and lower the "Ideal vertex
+cutoff" value using "set ideal_vertex_cutoff". 
+
+. drill geodesic <g-num> <n>
+
+Computes a tube around geodesic g-num and then computes a
+triangulation for the result of drilling out this geodesic. In fact
+this is equivalent to "compute tube <g-num>" followed by 
+"drill tube <n>". 
+
+.
+
+TUBE DIAGNOSTICS
+
+. set trace <tube-face-num>
+
+!! Not currently available. !! 
+Diagnostic for tube computations. Asks snap to keep track
+of what happens at a particular face during tube computation. To
+switch tracing off again do "set trace -1". To see the results of
+tracing a face, do "save trace" after "compute tube ..". 
+
+. save trace
+
+!! Not currently available. !! 
+Diagnostic for tube computations. Saves a picture of the successive
+results of clipping a face of the tube. The face to trace has to be
+set in advance of the tube computation via the "set trace"
+command. The output is saved in postscript format in the file
+"tube.ps". 
+
+.
+
+GETTING RID OF A TUBE
+
+. clear tube
+
+Clears the current tube.
+
+

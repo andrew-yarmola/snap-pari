@@ -1,0 +1,70 @@
+number_ccbig
+
+Reads ~/snap/snap_data/closed_census.big-jw and ClosedManifolds (in same dir) 
+and writes on standard output a numbered version of closed_census.big
+(saved as closed_census.big-num in snap_data).
+
+components < complements
+
+Reads from standard input, lines in the format of "complements" and tells us 
+how many connected components the graph of surgery relations has. 
+
+fix_drillings
+
+Updates "complements" file from the contents of "drilling_data". Takes no
+arguments or input other than these files. Renames old versions to "*~". 
+
+big_inj
+
+Reads lines on standard input in "complements" format and prints out those
+whose injectivity radius exceeds 0.01. 
+
+long_geod
+
+Reads lines on standard input in "complements" format and prints out those
+whose length exceeds 2.5.
+
+find_volrpt 
+
+Reads lines on standard input in "complements" format and prints out the
+closed manifold numbers and complement volumes of any closed manifolds
+which have repeated volumes among their drillings. 
+
+find_comprpt < complements
+
+Look for instances of two different geodesics being drilled from a manifold
+giving the same complements. 
+
+../tubal <index> <surgery-description>
+
+Tries to compute a local core tube for the given surgery description. 
+Writes a line in complements format if everything works out (i.e. the 
+tube domain for this filling is combinatorially equivalent to the Ford
+domain of the cusped manifold). Otherwise it writes out everything
+it could determine followed by a keyword saying what the failure was. 
+Output from this program, applied to every manifold from closed_census.big
+which was not found in "complements" is in the file tubality. 
+
+test_tube
+
+Reads a file containing lines of the form "<index> <surgery-description>"
+and writes the result of ../tubal on each line to the file "tubality". 
+Input should come from ccbig_diffs. 
+
+ccbig_diffs
+
+Prints all surgery descriptions in closed_census.big-num which were not
+found in "complements". 
+
+stats < complements
+
+Prints out how many manifolds of each number of tetrahedra are given
+as complements and the grand total. 
+
+find_missing < complements
+
+Prints out any closed manifold numbers not found in the complements file. 
+(Should be none.)
+
+
+ 

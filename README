@@ -1,0 +1,94 @@
+ABOUT SNAP
+----------
+Snap is a program derived from Jeff Weeks' program SnapPea. Its main
+function is to compute arithmetic invariants of hyperbolic
+3-manifolds. See the paper "Computing arithmetic invariants of
+3-manifolds," by Coulson, Goodman, Hodgson and Neumann, in
+Experimental Mathematics, Vol.9 (2000) Issue 1, available
+electronically from the publisher at http://www.expmath.org, and also
+included with the distribution in preprint form. See also articles by
+Neumann, Reid et.al. in Topology '90, Proceedings of the Research
+Semester in Low Dimensional Topology at Ohio State University. Berlin
+New York: de Gruyter 1992, for information about invariant trace
+fields and arithmetic invariants of 3-manifolds in general.
+
+Snap runs as a standalone Unix program. It presents the user with a
+command line interface which can be used to load and save
+SnapPea manifold files and compute arithmetic invariants and other
+information about them. It uses the number theory package Pari to
+do high precision arithmetic and number theoretic computations.
+
+SYSTEM/SOFTWARE REQUIREMENTS
+----------------------------
+Snap 1.11 has been tested with Pari version 2.1.4 to 2.1.7
+and less thoroughly with versions up to 2.3.4. 
+
+It has been developed under various operating systems with gcc
+versions through gcc 4.4.1
+
+AVAILABILITY
+------------
+
+Snap is hosted on sourceforge at http://sourceforge.net/projects/snap-pari/
+
+Pari is available via http://pari.math.u-bordeaux.fr/
+
+COMPILING AND INSTALLING
+------------------------
+Snap requires Pari and GNU Readline to be installed. If you wish to
+install in the default location, /usr/local, simply type 
+
+  ./configure
+
+followed by 
+
+  make install
+
+(or perhaps, "sudo make install"). This will install "snap" and
+"tube" in "/usr/local/bin" and the help text and various data files 
+in "/usr/local/share/snap_data".
+
+NOTES FOR USERS OF OLDER VERSIONS OF SNAP
+-----------------------------------------
+
+1. There was a problem with some of the precomputed tables of
+arithmetic invariants supplied prior to version 1.8.1: a coding error
+in the program used to compute these invariants led to some manifolds
+being incorrectly reported as having integer traces when this was not
+in fact the case. This error was not present in any 1.7* version of
+the program Snap itself, only the tables supplied with it.
+
+2. Versions of Snap prior to 1.8.0 made the mistaken assumption that
+all versions of Pari would compute the kernel of an integer linear
+transformation in the same way. This unfortunate assumption has led to
+some users of Snap (PC/DOS users only as far as I know) obtaining
+incorrect values from the eta invariant function, presumably after the
+Pari people changed something. This bug has been fixed in the current
+version of Snap.
+
+PARI polredabs() BUG
+--------------------
+
+Certain versions of Pari (from some time between 2.0.10 and 2.0.20 to
+some time before 2.1.4) contain a bug in the polredabs() function
+which prevents snap from correctly finding canonical polynomials. You
+can compile snap with these versions of Pari if you are not concerned
+with seeing canonical field representations.  (To check for this bug,
+run gp and do polredabs(x^2 - 2*x + 10). If it is fixed the answer
+should be x^2 + 1.)
+
+DOCUMENTATION
+-------------
+
+You can read the files data/snap_help and data/sample_session. The
+file snap_help is the file which is read by snap's online help
+function. See also the paper "Computing arithmetic invariants of
+3-manifolds" by Coulson, Goodman, Hodgson and Neumann: this is
+included as paper/snap.tex (and also paper/snap.ps). 
+
+CONTACT
+-------
+Please send bugs, questions and comments to: 
+Walter Neumann <neumann@math.columbia.edu> and 
+Oliver Goodman <oag@ms.unimelb.edu.au>
+

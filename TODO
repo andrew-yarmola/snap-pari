@@ -1,0 +1,42 @@
+
+
+
+All types which support == should also support !=. 
+All types which support < should provide >, <= and >=. 
+
+Implement Chern-Simons for manifolds having an acyclic 
+edge orientation. 
+
+ - Modify the reorient_tetrahedron function in orient.cc
+   so that it can apply an arbitrary permutation to the 
+   vertices of a tetrahedron. 
+
+Implement Chern-Simons in general by using one-finite-
+-vertex retriangulation. 
+
+Write tube code to fix up non-tubal triangulations. 
+
+ - Split function still seems to get the wrong 
+   faces most of the time. Look into this. 
+
+ - Then get the tubality test working when there 
+   are repeated edges at least.
+
+Write read/write functions for tube domains: basically
+this means the ortholength invariant and the combinatorial
+triangulation. 
+
+OR make the core tube triangulation properly local. 
+
+ - It can use words (and a representation of the group)
+   to get the elements for a face and its boundary curves. 
+
+ - When a change of combinatorics is indicated it can 
+   use the existing words to work out some new ones. 
+
+Code to compute the holonomy of a closed geodesic:
+
+ - A geodesic (given in the universal cover) should be
+   able to be diced into intervals in the Dirichlet domain
+   and face pairing transformations composed to find a
+   matrix and a word for the group element. 

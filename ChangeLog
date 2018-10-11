@@ -1,0 +1,286 @@
+2009-12-03  Matthias Goerner <matthias@math.berkeley.edu>
+	* fixed bug in make_inlines, added pari_oldnames.hh and modified
+	  configure.ac so that snap can be compiled with pari < 2.2 and >=
+	  2.2
+	* fixed various little issues when compiling with newer versions
+	  of g++
+
+2004-02-03  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+	* Merged tube_help into snap_help, merged all tube functionality
+	  into snap, rationalized away it_with_tube and it_with_dd_tiling.
+
+2003-07-15  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+	* Added "show help" command. 
+
+	* Finished converting to use GNU autoconf/automake. To be released
+          as version 1.10.2.
+
+2003-05-27  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Fixed get_transform which gave incorrect result for orientation
+          reversing transformations.  Added code to keep track of vertex
+          positions through the canonical_retriangulation code of
+          canonize_part_2.c. Now "print hidden symmetries" works even when
+          the canonical cell decomposition is not a triangulation. Added
+          "print -h symmetry action" to show the action of the hidden
+          symmetries on the current list of geodesics.
+
+2003-05-22  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Updated and reorganized snap_help. Fixed a number of small
+          inconsistencies in the program while I was at it. Tidied up the
+          output of the various gluing equation printing programs.
+
+2003-04-17  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Fixed some major problems with eta invariant code caused by
+          careless changes made when adding (limited) support for cone
+          manifolds.
+
+2002-11-27  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Fixed bug in fixed_points function which was giving wrong number
+          of fixed points and messing up the evaluate function.
+
+2002-11-26  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Added code to verify the core tube radius by computing a core
+          tube to the peripheral_curve function.
+
+2002-11-25  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Fixed bug in fwprint which occasionally caused 10. to be printed
+          using one character more than specified. Fixed some problems
+          with division by zero in snap when degenerate structures arise.
+
+2002-11-14  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Sorted out some precision issues with snap. The number prec has
+          to be the number of longwords of precision required PLUS TWO!
+
+2002-07-20  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Did a complete redesign of pariwrap. "pari" objects now have a
+          choice whether to live on the stack or in free store as
+          clones. The idea of this is to enable us eventually to modify
+          the GP calculator so that snap data structures can coexist with
+          the types that GP already understands.
+
+2002-07-10  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Added function "peripheral_curve" to print out how volume, core
+          geodesic length, and tube radius depend on surgery.
+
+2002-06-15  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Added function to test if a manifold is a two-bridge knot
+          complement.
+
+2002-06-14  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Added Makefile entries to pick up the various slight
+          discrepancies arising from my less than ideal way of handling
+          nonorientable manifolds above.
+
+2002-06-13  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Completed run of census data. Did lots of work on Makefile to
+          produce files presenting the resulting data in various useful
+          ways.
+
+2002-06-11  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Wrote update_comm_data to merge output of link_comm with
+          comm_data file (rather than having link_comm have to
+          inefficiently rewrite the whole comm_data file every time it
+          runs).
+
+2002-06-06  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Modified link_comm to handle nonorientable manifolds (albeit not
+          in the nicest possible way, it just takes double covers;
+          actually at wrong point in code allowing for discrepancy between
+          number of cusps in manifold_spec and rest of resulting record).
+          Wrote code sorted_file.cc/hh so that when I re-run link_comm
+          with special parameters for difficult cases it won't mess up the
+          output file by creating duplicates.
+
+2002-06-05  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Modified link_comm to work for census manifolds as well.
+
+2002-05-30  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Added readline to menu.cc.
+
+2002-05-29  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Snap and tube now share common code in basic_state.cc.
+
+2002-05-27  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Started converting tube_main.cc into basic_state.cc and
+          tube_prog.cc so that snap and tube can share all common
+          functions as common code.
+
+2002-05-21  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Did lots of work with link_comm and find_classes to create
+          link_data and grouped_link_data in snap/Links directory. Also
+          wrote a Makefile and some perl scripts (mainly in ~/bin) to
+          maintain these files and extract some statistics on them.
+
+        * Wrote function to compute cusp covering degrees: removes the
+          need for all tricky numerics involving cusp sizes.
+
+2002-05-15  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Fixed bug in hilbert symbol code in algebraic.cc caused by using
+          the unsafe function exact_value(), and corresponding bug in
+          link_comm.  Modified README, pariclass.hh and O31_GEN.c to work
+          with pari-2.0.10.beta rather than with later versions of pari
+          (since later versions have a bug in polredabs). This change will
+          be reflected in the next distribution of snap unless the pari
+          people fix it first.  Fixed field_db code which was getting
+          confused if the maximum index for a given degree wasn't one less
+          than the number of fields of that degree.
+
+2002-05-14  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Tidied up format of link_data file. Moved information about
+          field finding failures to separate file, fields_unknown.
+          Implemented better arithmeticity test using invariant trace
+          field generators as per Craig's suggestion (also in snap as
+          "test traces").
+
+2002-05-13  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Added flag to allow Dirichlet domains with fixed basepoint.
+          Modified link_comm to save more information from the numerical
+          arithmeticity test.  Fixed bug which was causing bigons to
+          appear in polytope computation.  Fixed small problem which was
+          slowing Damian's code down hugely.  Modified polytope code to do
+          a 3-way equal/unknown/unequal test: a warning is printed if the
+          result is unknown (assumed unequal).
+
+2002-05-10  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Worked on doing some of the 11-crossing cases by hand.
+
+2002-05-09  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Fixed problem with (tied) tilt_polytope calculation.
+          Recalculated the affected commensurators by hand.
+
+2002-05-08  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Completed first version of link_commensurator.cc and started it
+          on a major run.  Found problem with verify() function: some
+          inaccuracy in verifying the numerical logarithmic gluing
+          equations.  Found problem in tilt_polytope computation.  Found
+          that this function is occasionally called with cusp_size outside
+          the face defined by the tilts somehow.
+
+2002-05-06  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Wrote code for maintaining a database of fields.
+
+2002-05-03  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Modified precision in "snap" to be in terms of 32-bit words.
+
+2002-05-02  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Fixed bug in exact cusp commensurability testing (matrix had one
+          too few columns!)  Added cusp ties to tilt polytope computation.
+
+2002-05-01  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Fixed bugs in eta invariant code caused by changes to the
+          surgery coefficient vector (length now 3*n_cusps since rational
+          coefficients were permitted).  Added printout of cusp action to
+          "isometry" function in "snap".  Added cusp size/area printout to
+          "print hidden_symmetries" and "print commensurator" functions.
+          Added numeric non-arithmeticity test to "snap".
+
+2002-04-30  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Removed it_with_isometries code.  Added triangulation_changing()
+          function to keep things up to date when the triangulation
+          changes but the manifold stays the same.  Added numeric cusp
+          commensurability test to snap.
+
+2002-04-24  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Modified "print commensurator" to use tilt polytope for multi
+          cusped manifolds. Original function renamed to "print
+          hidden_symmetries".  Added "commensurability" function to check
+          if two manifolds are commensurable.
+
+2002-04-22  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Added computation of tilt polytope to tube.
+
+        * Modified proto_canonize to accept size rather than area
+          multipliers in preparation for tilt polytope computation and use
+          displacement_exp (cusp cross section size) in computation.
+
+2002-04-19  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Wrote polytope.cc/hh, n_vector.cc/hh and started
+          tilt_polytope.cc/hh for computing the tilt polytope of a cusped
+          manifold.
+
+2002-04-15  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Added code to compute a tilt matrix which determines the set of
+          cusp heights for which a triangulation is dual to the Ford
+          spine.
+
+2002-04-12  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Added computation of equivalence classes of cusp under hidden
+          symmetries found by Damian's commens code, now printed out by
+          the "print commensurator" function.
+
+        * Simplified cusp commensurability test: test can be done in shape
+          field, don't need to find all the cusp fields.
+
+2002-04-11  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Fixed bug in "ident" function which was giving a fatal error.
+
+        * Added "print cusp commensurability" to "snap". Does exact
+          commensurability test on cusp shapes; requires shape field.
+
+        * Added read link function to "tube". 
+
+        * Made new file helpers.cc/hh shared between snap and tube for
+          interactive functions which will be shared by snap_main and
+          tube_main but do not belong in it_with_dd_tiling.
+
+        * Adapted and compiled Morwen Thistlethwaite's dt2snap code for
+          reading Dowker-Thistlethwaite codes for links.
+
+2002-04-05  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Added extra argument to "canonize" such that a ratio of cusp
+          neighborhood areas can be specified for any manifold having 2 or
+          more cusps.
+
+2002-04-01  Oliver Goodman  <oag@ms.unimelb.edu.au>
+
+        * Added code to allow snap to compute exact shapes when surgery
+          results in a cone manifold structure with cone angles a rational
+          multiple of pi. Added "cone_surgery" function to support entry
+          of such surgery coefficients.
+
+        * Compiled Damian's commens.cc in tube dir. Added a "print
+          commensurator" function to print the commensurator of any
+          non-arithmetic 1-cusped manifold.
+
+	* Added an option to normalize shapes in printout of low
+	  precision shape parameters in snap.
+

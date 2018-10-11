@@ -1,0 +1,3030 @@
+\documentclass[a4paper]{amsart}
+%\usepackage{graphics}
+%\usepackage{epsfig}
+\usepackage{array}
+% \usepackage{doublespace}
+%\usepackage{supertabular}
+\usepackage{rotating}
+
+\setlength{\unitlength}{0.7pt}
+
+%%%%%%%%%%%%%%%%%%%% macros %%%%%%%%%%%%%%%%%%%%
+
+\def\A{{\mathbb A}}
+\def\H{{\mathbb H}}
+\def\N{{\mathbb N}}
+\def\Z{{\mathbb Z}}
+\def\Q{{\mathbb Q}}
+\def\R{{\mathbb R}}
+\def\C{{\mathbb C}}
+
+\def\contains{\supseteq}
+\def\supp{\mbox{\rm supp}}
+\def\diam{\mbox{\rm diam}}
+\def\path{\mbox{\rm Path}}
+\def\half{{1\over 2}}
+
+\def\cal{\mathcal}
+\def\O{{\cal O}}
+\def\P{{\cal P}}
+\def\Otil{\tilde{\O}}
+\def\Xp{{X'}}
+\def\Yp{{Y'}}
+\def\Zp{{Z'}}
+\def\xp{{x'}}
+\def\yp{{y'}}
+\def\zp{{z'}}
+\def\K{\tilde{K}}
+
+\def\psl2c{\mbox{\rm PSL}(2,\C)}
+\def\sl2c{\mbox{\rm SL}(2,\C)}
+\def\tr{\mbox{\rm tr}}
+\def\Gammatil{\tilde{\Gamma}}
+\def\p{{\mathfrak p}}
+\def\q{{\mathfrak q}}
+
+\newcommand{\PreserveBackslash}[1]{\let\temp =\\#1\let\\=\temp}
+
+%%%%%%%%%%%%%%%%% enviroments %%%%%%%%%%%%%%%%%%%
+
+\newenvironment{pf}{\begin{proof}}{\end{proof}}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{procedure}[theorem]{Procedure}
+\newtheorem{para}[theorem]{}
+%\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{notation}{Notation}		\renewcommand{\thenotation}{}
+
+%\theoremstyle{definition}
+%\theoremstyle{remark}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{Computing arithmetic invariants of 3-manifolds}
+
+\author{D. Coulson}
+
+\author{O.A. Goodman}
+
+\author{C.D. Hodgson}
+
+\author{W.D. Neumann}
+
+\address{Department of Mathematics and Statistics,
+University of Melbourne, Parkville, Victoria 3052, Australia.}
+
+\thanks{Work supported by grants from the Australian
+Research Council. This paper has been submitted
+to Experimental Mathematics.}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+This paper describes ``Snap'', a computer program for computing
+arithmetic invariants of hyperbolic 3-manifolds. Snap is based on Jeff
+Weeks's program ``SnapPea'' \cite{snappea} and the number theory
+package ``Pari'' \cite{pari}. SnapPea computes the hyperbolic
+structure on a finite volume hyperbolic 3-manifold numerically (from
+its topology) and uses it to compute much geometric information about
+the manifold. Snap's approach is to compute the hyperbolic structure
+to very high precision, and use this to find an exact description of
+the structure. Then the correctness of the hyperbolic structure can be
+verified, and the arithmetic invariants of Neumann and Reid \cite{nr1}
+can be computed. Snap also computes high precision numerical
+invariants such as volume, Chern-Simons invariant, eta invariant, and
+the Borel regulator.  As sources of examples both ``Snap'' and
+``SnapPea'' include the Hildebrand-Weeks census of all $4,815$
+orientable cusped manifolds triangulated by up to seven ideal
+simplices (see \cite{HiW}), and the Hodgson-Weeks census of $11,031$ low-volume closed
+orientable manifolds having no geodesic of length less than $0.3$ (see \cite{Ho-We}).
+(``SnapPea'' also includes a census of nonorientable cusped manifolds.)
+Snap is available from http://www.ms.unimelb.edu.au/\~{}snap.
+
+\section{Ideal Triangulations}
+
+\def\Ct{\tilde{\C}}
+
+SnapPea and Snap represent an orientable, finite volume, hyperbolic
+3-manifold as a set of ideal tetrahedra in $\H^3$ with face
+pairings. Identifying the sphere at infinity of $\H^3$ with $\Ct = \C
+\cup \{\infty\}$, the orientation preserving congruence class of a 
+tetrahedron is given by the cross ratio of its vertices; oriented
+tetrahedra, whose vertices are numbered consistently with the
+orientation, correspond to cross ratios with positive imaginary part.
+After choosing orderings for the vertices of each tetrahedron, 
+the tetrahedra are given by complex numbers
+$\{z_1,\ldots,z_n\}$, called their {\em shape parameters}, lying in
+the upper half plane.
+Changing the vertex ordering of a tetrahedron may replace
+$z_j$ by $1-z_j^{-1}$ or $(1-z_j)^{-1}$.
+
+
+For the result of gluing these tetrahedra to represent a hyperbolic
+3-manifold, the following {\em gluing conditions} must be satisfied:
+\begin{enumerate}
+\item Around each edge of the complex, the sum of the dihedral angles must
+be $2\pi$, and the edge must be glued to itself without translation. 
+\item Each cusp (neighborhood of an ideal vertex) must
+either (i)  have a horospherical torus cross section, or (ii)
+admit a compactification by adding a closed geodesic around which there
+is an angle of $2\pi$ and no translation. 
+\end{enumerate}
+
+\begin{remark}
+A probably more familiar situation is that of gluing the faces of a
+compact polytope to obtain a closed geometric manifold. In this case
+the translation condition is unnecessary since it is automatically
+satisfied. 
+\end{remark}
+
+If every cusp has a horospherical torus cross section, the glued
+complex is a complete hyperbolic 3-manifold. 
+If some cusps require compactification, the result is a Dehn filling
+of the glued complex. 
+Ideal triangulations are described in much more detail in
+\cite{thurston}. 
+
+% SnapPea solves logarithmic gluing equations. 
+
+The above conditions are equivalent to a set of equations in the $z_i$
+which we shall describe shortly. 
+First we need to define a kind of ``complex dihedral
+angle'' for the edges of an ideal tetrahedron.
+For each edge of an ideal tetrahedron, there is a loxodromic
+transformation, having the edge as axis, and 
+taking one of the two adjacent faces onto the other. The {\em
+logarithmic edge parameter} of the edge is $r + i\theta$, where $r$ is
+the translation distance of the transformation, and $\theta$ is the
+angle through which it rotates. For oriented tetrahedra, with
+consistently numbered vertices, we can take $\theta \in (0,\pi)$. The
+corresponding {\em edge parameter} is $e^{r+i\theta}$.  If the
+tetrahedron has shape parameter $z$, each edge parameter is one of
+$z, 1-z^{-1}$, or $(1-z)^{-1}$.
+
+Condition~1 is that, for each edge of the 3--complex, the sum of the
+logarithmic edge parameters is $2\pi i$.  Condition~2 can be similarly
+expressed; the exact set of terms which are added depends on whether
+the cusp is 
+complete or filled.
+We call these the {\em
+logarithmic gluing equations} of the ideal triangulation.  
+
+When SnapPea is given a 3-manifold topologically, as a set of face
+pairings for ideal tetrahedra, and perhaps also Dehn fillings for some
+of the cusps, it attempts to solve the logarithmic gluing equations numerically.
+A solution is called {\em geometric} if all the $z_i$ lie in the upper
+half plane. Corresponding ideal tetrahedra
+can then be glued together, along some of the faces, to give an ideal
+fundamental polyhedron for the manifold; the remaining face pairings
+give a faithful representation of its fundamental group into $\psl2c$. 
+
+If not all of the $z_i$ lie in the upper half plane the solution may
+still have a meaningful interpretation. Regard {\em any} quadruple of
+points in $\Ct$ as a tetrahedron. Call it {\em geometric} if the cross
+ratio lies in the upper half plane, {\em flat} if it is real and not
+equal to $0$ or $1$, {\em degenerate} if it is $0, 1$, $\infty$ or
+undefined (i.e.\ if two or more vertices coincide), and {\em negatively
+oriented} if it is in the lower half plane.  A solution without
+degenerate tetrahedra certainly gives a representation of the
+fundamental group of the manifold into $\psl2c$. However, the representation
+need not however be faithful and may not have a discrete image.
+
+It follows from the existence of canonical ideal cell decompositions
+of finite volume hyperbolic manifolds \cite{ep} that every such 3-manifold
+can be represented using only geometric and flat tetrahedra: decompose
+each cell into tetrahedra, then match differing face triangulations
+using flat tetrahedra (if necessary). It is conjectured that in fact 
+only geometric tetrahedra are needed in this case. 
+
+For closed hyperbolic 3-manifolds the situation is less
+clear. Certainly every such manifold can be obtained topologically by
+Dehn filling a suitable hyperbolic link complement.  This means that
+any solution of the gluing equations will give a representation of
+the fundamental group into $\psl2c$. Unless, however, the solution
+is geometric, it cannot be guaranteed that the representation is
+faithful or discrete. 
+
+% Shapes are algebraic. 
+
+What is important, for present purposes, is that the gluing conditions can
+also be given as a set of polynomial equations, with rational coefficients,
+in the $z_i$. The {\em gluing equations} are obtained from the logarithmic gluing
+equations by exponentiation. These equations state
+ that certain products of edge parameters (of
+the form $z_i, 1-z_i^{-1}$, and $(1-z_i)^{-1}$) equal $1$. Multiplying
+through by suitable powers of $z_i$ and $(1-z_i)$ we obtain \
+polynomial equations. Note
+that the gluing equations only specify that the angle sum, around each
+edge or filled cusp, is a multiple of $2\pi$. In terms of numerical
+computation however, it is straightforward to check if a solution
+actually gives an angle sum of precisely $2\pi$.
+
+Mostow-Prasad rigidity \cite{mostow} implies that the solution set of
+the gluing equations is 0-dimensional. It follows that the $z_i$ in
+any solution are algebraic numbers: compare Macbeath's proof of Theorem~4.1
+in \cite{macbeath}. For example, the complement in $S^3$ of the figure 8
+knot has an ideal triangulation by two tetrahedra with shape
+parameter
+$$
+z_1 = z_2 = \frac{1}{2} + \frac{\sqrt 3}{2}i.
+$$
+This is actually the shape parameter of a {\em regular} ideal tetrahedron. 
+
+We can also assume that the entries of a set of $\psl2c$ matrices
+for the fundamental group are algebraic: position the
+fundamental polyhedron such that one tetrahedron has three of its vertices at
+$0,1$, and $\infty$. The remaining vertices will be algebraic, as
+will entries of the face pairing transformation matrices. The other
+matrices, being products of these, will also have algebraic entries. 
+
+
+\section{Computation with Algebraic Numbers}
+
+In order to give an exact representation of a 3-manifold we clearly
+need a way to represent algebraic numbers. We give a brief discussion,
+referring to \cite{cohen} and \cite{pohst} for more details.
+The most obvious way to
+represent an algebraic number is to give a polynomial with rational
+coefficients, whose roots include the number in
+question, and somehow specify which root is intended. The latter can be done
+by giving the root numerically to sufficient precision. The roots can
+also be sorted and given by number.
+
+Carrying out the field operations with algebraic numbers given in this
+way is slightly non-trivial: a ``resultant trick'' enables us, given
+two numbers, to compute a polynomial whose roots include the sum of
+the two numbers. We must then determine which root is the sum, perhaps
+by computing the latter numerically to sufficient
+precision. Differences, products and quotients can be similarly
+computed.
+
+In fact we do not use quite this approach. We specify one number,
+$\tau$ say, in
+the above manner, then represent other numbers as $\Q$-polynomials 
+in $\tau$. Let $f$ be the minimum polynomial of $\tau$ and let $n$ be
+the degree of $f$. Then the field $\Q(\tau)$ is a degree $n$ extension 
+of $\Q$, and
+each element of $\Q(\tau)$ has a unique representation as a
+$\Q$-polynomial in $\tau$ of degree at most $n-1$. 
+
+Field operations in $\Q(\tau)$ are now very easy: sum and difference
+computations are obvious; a product can be computed directly then
+reduced to a polynomial of degree at most $n-1$ by subtracting a
+suitable multiple of $f(\tau)$. A quotient  $g_1(\tau)/g_2(\tau)$ is
+computed by using the Euclidean algorithm to find polynomials $a,b$ 
+such that $af +
+bg_2 = 1$, whence $b(\tau) = g_2(\tau)^{-1}$.
+
+Pari \cite{pari} implements this kind of arithmetic: the expression {\tt
+mod($g,f$)}, called in Pari a {\em polymod}, represents $g(\tau)$
+where $\tau$ is a root of $f$. Note that it is not necessary to
+specify {\em which} root is chosen to do arithmetic with polymods, since
+a change of root is a field isomorphism.
+
+
+Of course if we want to add $\alpha, \beta$ belonging to different
+number fields we must either fall back on the first approach, or find
+a new primitive element, $\sigma$ such that $\Q(\sigma) \supseteq
+\Q(\alpha,\beta)$, and re-express both $\alpha$ and $\beta$ in terms of
+$\sigma$. For the most part, however, our approach is to first find a
+number field which contains all the numbers we are
+interested in and then carry out the required computations inside this
+field.
+
+% finding exact shape parameters. 
+
+Our aim then, given a 3-manifold with shape parameters
+$\{z_1,\ldots,z_n\}$, is to find an irreducible polynomial $f \in
+\Z[x]$ with root $\tau$ such that $z_1,\ldots,z_n \in \Q(\tau)$. In
+outline what we do is this:
+\begin{enumerate}
+\item compute each $z_i$ to high precision,
+typically around 50 decimal places; 
+\item use an algorithm, called the
+LLL algorithm, to guess a polynomial in $\Z[x]$ vanishing on each
+$z_i$;
+\item check if all the $z_i$ belong to the field generated by one of
+them, also using the  LLL algorithm. 
+\end{enumerate}
+Step~1 is done by Newton's method, using the solution provided by
+SnapPea as a starting point. 
+Usually the check in Step~3 is successful. When it is not we try small
+rational linear combinations of the $z_i$ to find a primitive element
+for $\Q(z_1,\ldots,z_n)$. A side effect of Step~3 is that we obtain
+an expression for each of the $z_i$ in terms of the primitive element. 
+
+Since the LLL algorithm is fundamental we describe a little further
+what it is and how it is applied in Steps~2 and 3 above. Most of what
+follows is described much more precisely in \cite{cohen} and
+\cite{pohst}.
+
+The LLL algorithm is an algorithm which finds a ``good'' basis for an 
+integer lattice
+with respect to a given inner product. A good basis is one which
+consists of short and approximately orthogonal elements. 
+Roughly, how it does this is
+to apply Gram-Schmidt ``orthogonalization'' to the starting basis, 
+but modified so that only nearest integer multiples of basis
+elements are added or subtracted. 
+Whenever
+an element is obtained which is significantly shorter than the
+preceeding ones, it is moved in front of them, and 
+Gram-Schmidt is started again from there. 
+The resulting basis always contains elements not too far from
+being shortest in the lattice. We emphasize that the result is
+dependent on the {\em inner product}: the lattice in our case is
+always simply the integer lattice $\Z^n$; it is by varying the
+inner product that we obtain useful results. 
+
+Now suppose that $z$ approximates an algebraic number $\tau$. To find
+an integer polynomial, of degree at most $m$, vanishing on $\tau$ we
+look for one which is small on $z$. In fact we use LLL to find a short
+vector in $\Z^{m+1}$ with respect to the inner product given by the
+quadratic form\footnote{A slightly different
+quadratic form is actually used, namely the $a_0^2$ term is omitted if
+$z$ is real and the $a_0^2$ and $a_1^2$ terms are omitted if $z$ is
+nonreal. The reason is pragmatic: LLL initializes by doing a
+true Gram-Schmidt reduction of the form, and the resulting
+basis-change is the same to within machine precision for the modified
+form, but is given by a much simpler formula.}: 
+$$ 
+(a_0,\ldots,a_m) \mapsto a_0^2 + \ldots + a_m^2 + N
+| a_0 + a_1 z + a_2 z^2 + \ldots + a_m z^m |^2, 
+$$ 
+where $N$ is a large number, around $10^{1.5 d}$ if $z$ is given to
+$d$ decimal places. If $a_0 + a_1 z + a_2 z^2 + \ldots + a_m z^m$ is
+not zero, to approximately the precision to which $z$ is known, the
+term $N | a_0 + a_1 z + a_2 z^2 + \ldots + a_m z^m |^2$ will make
+$(a_0,\ldots,a_n)$ long. Thus if LLL finds any short vectors,
+it has most likely found $(a_0,\ldots,a_m)$ such that $a_0 + a_1 \tau + 
+a_2 \tau^2 + \ldots + a_m \tau^m = 0$. By factoring this polynomial, 
+and identifying which irreducible factor has
+$\tau$ as a root, we can determine $\tau$'s minimum polynomial. 
+Of course, if $\tau$'s
+minimum polynomial has degree greater than $m$, this whole process is doomed
+to failure. Assuming however that we have chosen $m$ sufficiently large, this
+application of LLL completes Step~2 above. 
+
+For Step~3 we need to check if $\alpha$, algebraic, approximated by
+$w$, belongs to $\Q(\tau)$. We use the LLL algorithm to find a small
+vector in $\Z^{n+1}$ with respect to the inner product given by the 
+quadratic form:
+$$ 
+(a,a_0,\ldots,a_{n-1}) \mapsto a^2 + a_0^2 + \ldots + a_{n-1}^2 + N
+| aw + a_0 + a_1 z + \ldots + a_{n-1} z^{n-1} |^2, 
+$$ 
+where $N$ is as before and $n$ is the degree of $\tau$'s minimum
+polynomial. As before, if LLL finds a short vector, 
+it most likely has found $(a,a_0,\ldots,a_{n-1})$ such
+that $a\alpha + a_0 + a_1 \tau + a_2 \tau^2 + \ldots + a_{n-1} \tau^{n-1} = 0$. 
+Since $n$ is the degree of $\tau$'s minimum polynomial, $a$ should not
+be zero; so we obtain an expression for $\alpha$ in terms of $\tau$. 
+On the other hand, if $aw + a_0 + a_1 z + a_2 z^2 + \ldots + a_{n-1}
+z^{n-1}$ is not zero, to approximately the precision to which $z$ and
+$w$ are known, it is likely that $\alpha \not\in \Q(\tau)$.
+Refinements of these procedures can be found in \cite{cohen} and \cite{pohst}. 
+
+We can give a rough analysis of the above use of the LLL algorithm.
+Denote by $b(a_0,\dots,a_m)$ the above quadratic form that is reduced
+by the LLL algorithm to find a good integer polynomial for $z$.  One
+can easily check that this bilinear form has determinant approximately
+equal to $N$ or $N^2$ according as $z$ is real or non-real. (In this
+discussion, ``approximately equal to'' will mean ``equal to a bounded
+multiple of.'' The actual determinants are very close to $N$ and
+$(\operatorname{Im}zN)^2$ respectively.)  In our applications $z$ is
+complex, but we will analyze the algorithm without this assumption, so
+let $k=1$ or $2$ according as $z$ is real or non-real.  Putting
+$N=10^P$, we can write $$\det(b)\sim 10^{kP}.$$ Now crude estimates
+suggest that a ``random'' quadratic form of determinant $D$ on
+$\Z^{m+1}$ will have minimum on $\Z^{m+1}-\{0\}$ approximately equal
+to $D^{1/(m+1)}$. In our case:
+$$\min\{b(a_0,\dots,a_m):(a_0,\dots,a_m)\in\Z^{m+1}-\{0\}\}\sim
+10^{kP/(m+1)}.$$ Since the coefficients $a_i$ contribute their squares
+to this minimal $b(a_0,\dots,a_m)$, they will be bounded by
+approximately $10^{kP/(2m+2)}$.  Thus if we expect coefficients
+bounded by $10^c$ we need $c$ less than $kP/(2m+2)$ and hence
+$$P\approx 2(m+1)c/k$$ or larger.  Conversely, once $P$ is chosen, $c$
+is bounded by about $Pk/2(m+1)$.
+
+The minimal $b(a_0,\dots,a_m)$ also includes a contribution $10^Pl^2$ with
+$$l=a_0+a_1z+\dots+a_mz^m,$$
+so we also have 
+$10^P|l|^2\sim 10^{kP/(m+1)}$ so
+$$|l|\sim 10^{P(k-m-1)/2(m+1)}.$$
+This is expected even if the original $\tau$ that $z$ approximates
+does not satisfy an integer polynomial in degree $m$.  Thus to detect
+that the polynomial that we find is a good one, we should use somewhat
+more than $P(m+1-k)/2(m+1)\approx P/2$ digits of precision. 
+
+Snap adjusts $P$ so that it uses $d=2P/3$ digits of precision.  Since
+$k=2$ in Snap's applications, this means we can hope Snap will find
+polynomials with coefficients up to about $10^{3d/2(m+1)}$.  Snap's
+default (which can be changed at any time) is to work with degree $16$
+and precision $d=50$, so we can hope to find polynomials with
+coefficients bounded by about $10^{4.5}$, and expect to find them if the
+coefficients are significantly smaller than this.
+
+We can roughly quantify the likelihood of finding ``false positives''
+in these applications of LLL. Given $n$ random complex numbers
+$\zeta_1,\dots,\zeta_n$ in the unit disk, the number of complex
+numbers of the form $a_1\zeta_1+\dots+a_n\zeta_n$ in the unit disk
+with $|a_i|\le 10^c$ is approximately $10^{(n-2)c}$, so the total area
+covered by a disk of radius $10^{-p}$ around each will be
+approximately $10^{(n-2)c-2p}\pi$ if $p$ is significantly larger
+than $(n-2)c$.  Thus the probability of one of these linear
+combinations $a_1\zeta_1+\dots a_n\zeta_n$ being ``accidentally''
+within $10^{-p}$ of $0$ is about $10^{(n-2)c-2p}$. With a machine
+precision of $10^{-d}$ and coefficients up to $10^c$ we should take
+$p=d-c$, so the likelihood of a false positive becomes about
+$10^{nc-2d}$.  With Snap's defaults ($n=17, d=50$) described above and
+$c=4.5$, this is about $10^{-23}$.
+
+As we increase both precision and degree, the running time of the
+algorithm goes up. 
+We were unable to find any estimates of the expected
+running time of the LLL algorithm in the literature, but experiment suggests
+ that typical running times using Pari 2.03's implementation
+on a Sparc~5 machine satisfy:
+$${\rm~running~time~(sec)~}\approx 
+3.7 \times 10^{-7} (precision)^{2.6} (degree)^{2.7},$$
+for degrees between $10$ and $20$ and precisions between $80$ and $180$.
+
+Finally, note that whatever choice we make for $n$ in Step~2,
+it is the degree of the minimum polynomial found which governs $n$ in
+Step~3: often this will be smaller and the LLL computations in Step~3
+will run correspondingly faster.
+
+Snap follows the procedure outlined above to find a number field
+containing all the shape parameters of a given 3-manifold, and an
+exact expression for each shape in terms of a primitive element for that
+field. Snap's ``verify'' function then substitutes the exact shapes
+back into the gluing equations to check that they are satisfied. Here
+is sample output for the figure 8 knot complement. 
+
+\begin{verbatim}
+Shapes (Numeric)
+shape(1) = 0.50000000000000000000000 + 0.86602540378443864676372*i
+shape(2) = 0.50000000000000000000000 + 0.86602540378443864676372*i
+
+Shape Field
+min poly: x^2 - x + 1
+root number: 1
+numeric value of root: 0.50000000000000000000000 + 0.8660254037844
+3864676372*i
+
+Shapes (Exact)
+shape(1) = x 1.33737 E-67
+shape(2) = x 5.24561 E-68
+
+Gluing Equations
+Meridians:
+1, 0; 0, 1; 0 -> 1 : 9.27301 E-68
+Longitudes:
+0, -2; 0, 4; 2 -> 1 :  0.E-57
+Edges:
+2, -1; -1, 2; 0 -> 1 : 1.29822 E-67
+-2, 1; 1, -2; 0 -> 1 : 1.29822 E-67
+\end{verbatim}
+
+The root number says which root of the minimum polynomial is used as a
+primitive element for the field. The numbering scheme used will be
+described when we discuss canonical representations of number fields
+in $\C$. The small number following each exact shape 
+(eg.\ {\tt 1.33737 E-67}) gives the accuracy of the 
+originally computed numerical shape. It is included 
+only as a sanity check.
+
+Finally we have the gluing equations. As we have already
+noted, the gluing equations come down to the requirement that certain
+products of terms of the form $z_i, 1 - z_i^{-1}$ and $(1 - z_i)^{-1}$
+give 1. This is equivalent to certain products of powers of
+$z_i, 1-z_i$ and $-1$, giving 1: see for example \cite{nz}. Reading
+each gluing equation horizontally we have powers of $z_1,\ldots,z_n$,
+powers of $1-z_1,\ldots,1-z_n$, and the power of $-1$, followed by
+their product in exact arithmetic.
+This is followed after a colon by the precision to which the
+logarithmic gluing equation has been verified.  Since the 
+gluing equation is exactly correct, the logarithmic
+gluing equation is known to be correct up to an integer multiple of $2\pi
+i$, so it would suffice to verify it to much lower precision than 
+is actually done.  
+
+Since this output shows that the logarithmic gluing equations have
+been verified exactly, and the shape parameters were in the upper half
+plane, signifying correctly oriented simplices, it proves the
+existence of a hyperbolic structure with an ideal triangulation with
+the given simplex shapes.
+
+The meridian and longitude referred to in the printout are curves, in
+a cross section of the cusp, which give a basis for the first homology group
+of that cross section. Typically SnapPea uses shortest curve and next
+shortest independent curve, in the Euclidean structure on a horospherical cusp
+cross section, as the meridian and longitude respectively.
+(For knot and link complements, SnapPea uses the conventional 
+terminology: where a meridian 
+means a curve bounding a disk transverse to the knot or link, while a
+longitude means a curve that
+runs parallel to the knot or to a component of the link and is
+null-homologous in $S^3$ minus the knot or link component.)
+Corresponding to each meridian or longitude is a gluing equation for
+the cusped hyperbolic structure. The gluing equations for a Dehn
+filled manifold include  one equation for each filled
+cusp, corresponding to the filling  curves. 
+
+\section{Commensurability Invariants}
+
+Two finite volume, orientable, hyperbolic 3-manifolds are said to be {\em
+commensurable} if they have a common finite-sheeted cover. Subgroups
+$\Gamma,\Gamma' \subset \psl2c$ are commensurable if there exists
+$g\in \psl2c$ such that $g^{-1}\Gamma g \cap \Gamma'$ is a finite
+index subgroup of both $g^{-1}\Gamma g$ and $\Gamma'$. Therefore, by
+Mostow rigidity, finite
+volume, orientable, hyperbolic 3-manifolds are commensurable if and only
+if their fundamental groups are commensurable as subgroups of $\psl2c$. 
+
+\subsection{The Invariant Trace Field}
+
+Let $\Gamma$ be the group of covering transformations of such a
+manifold, and let $\Gammatil$ denote the preimage of $\Gamma$ in $\sl2c$.
+The traces of elements of $\Gammatil$
+generate a number field $\Q(\tr\Gamma)$ called the {\em trace field} of
+$\Gamma$. That $\Q(\tr\Gamma)$ is a number field follows from the
+observation that $\Gamma$ is finitely generated and, by conjugating
+suitably (as described at the end of section 2)
+ we can assume that the generators have algebraic entries. 
+The trace field $\Q(\tr\Gamma)$ is almost, but not quite, a
+commensurability invariant of $\Gamma$: see \cite{reid}.
+
+The {\em invariant trace field} $k(\Gamma)$ of $\Gamma$ may be defined as
+the intersection of all the fields $\Q(\tr\Gamma')$, as $\Gamma'$ varies
+over all finite index subgroups of $\Gamma$. Defined in this way it is
+clear that $k(\Gamma)$ is a commensurability invariant of $\Gamma$.
+What is less clear is that it is ever non-trivial. We have, however, the
+following. 
+
+\begin{theorem}[Reid \cite{reid}]
+$k(\Gamma) = \Q(\{\tr^2(\gamma) \mid \gamma\in\Gamma\}) =
+\Q(\tr\Gamma^{(2)})$, where $\Gamma^{(2)}$ is the finite index subgroup of
+$\Gamma$ generated by squares $\{\gamma^2\mid\gamma\in\Gamma\}$. 
+\end{theorem}
+
+We have seen how it is possible, given a set of generators for a field,
+to guess a primitive element for that field along with its
+corresponding minimum polynomial. In order to compute the trace and
+invariant trace fields of $\Gamma$ we must find {\em finite} sets of
+generators for the two fields. 
+
+\begin{theorem} \label{genset}
+Let $\Gammatil\subset\sl2c$ be finitely generated by $\{g_1,\ldots,g_n\}$.
+The trace, $\tr(g_{i_1}\ldots g_{i_k})$, of an element of
+$\Gammatil$ can be expressed as a
+polynomial with rational coefficients in the traces: $\tr(g_i),
+1\leq i \leq n$, $\tr(g_ig_j), 1\leq i < j\leq n$, and (if $n>2$) the
+trace of one triple product of generators, e.g.\ $\tr(g_1g_2g_3)$.
+Also, $\tr(g_{i_1}\ldots g_{i_k})$ is an algebraic integer if $\tr(g_i),
+1\leq i \leq n$, and $\tr(g_ig_j), 1\leq i < j\leq n$ are algebraic integers. 
+\end{theorem}
+
+\begin{proof}
+For the trace relations used in the following, see Magnus
+\cite{magnus}. 
+Let $K$ be the field generated over $\Q$ by the traces $\tr(g_i),
+1\leq i \leq n$, and $\tr(g_ig_j), 1\leq i < j\leq n$. Let $P_{ijk} =
+\tr(g_i g_j g_k) + \tr(g_i g_k g_j)$ and $Q_{ijk} = \tr(g_i g_j g_k) .
+\tr(g_i g_k g_j)$. 
+Then $\tr(g_i g_j g_k)$ and $\tr(g_i g_k g_j)$ are the roots of $z^2 -
+P_{ijk} z + Q_{ijk} = 0$. 
+Fricke's Lemma (in \cite{magnus}) implies that
+$P_{ijk}$ and $Q_{ijk}$ are integer
+polynomials in the $\tr(g_i)$ and $\tr(g_ig_j)$, hence
+they are in $K$. 
+Writing $\Delta(g_i,g_j,g_k)$ for the discriminant $P_{ijk}^2 - 4 Q_{ijk}$ it
+is clear that for any extension $K_1$ of $K$,
+$\tr(g_i g_j g_k) \in
+K_1$, if and only if both $\tr(g_i g_j g_k)$ and $\tr(g_i g_k g_j)\in
+K_1$, if and only if $\sqrt{\Delta(g_i,g_j,g_k)}\in K_1$. 
+
+By \cite{magnus}, Lemma~2.3, for any $i,j,k$ and $i',j',k'$ in
+$\{ 1,\ldots,n \}$, 
+$$
+\sqrt{\Delta(g_i,g_j,g_k)} \cdot \sqrt{\Delta(g_{i'},g_{j'},g_{k'})} \in K.
+$$
+Therefore $\sqrt{\Delta(g_i,g_j,g_k)} \in K_1$ if and only if
+$\sqrt{\Delta(g_{i'},g_{j'},g_{k'})}\in K_1$. 
+If we now put $K_1 = K(\tr(g_1g_2g_3))$ it follows from the above
+observations that $\tr(g_i g_j g_k) \in K_1$ for all $i,j,k$ in
+$1,\ldots,n$. 
+
+We show next, by induction on $k\geq 3$, that $K_1$ contains the
+traces of all $k$--fold products of the generators $g_i$. We have just
+shown that this is so for $k=3$. Suppose then that $k>3$ and $K_1$
+contains the traces of all $(k\!-\!1)$--fold products of generators. 
+Then for each product
+$g' = g_{i_1} \ldots g_{i_{k-2}}$, $K_1$ contains all traces, and
+all traces of products of pairs, of elements
+in the set $\{g_1,\ldots,g_n,g'\}$.
+Moreover it contains at least one triple product, namely $\tr(g_1 g_2
+g_3)$. By the above argument it follows that $K_1$ contains the traces
+of all triple products of elements of this set. In particular, $K_1$
+contains the trace of $g'g_i g_j$ for each $g'$ as above, and $i,j$ in
+$\{ 1,\ldots,n \}$. Since these are all the $k$--fold products of the $g_i$,
+this proves the first statement. 
+
+Finally, if the $\tr(g_i)$ and $\tr(g_ig_j)$ are all algebraic
+integers, $P_{ijk}$ and $Q_{ijk}$ are also. Therefore $\tr(g_i g_j
+g_k)$ and $\tr(g_i g_k g_j)$, being roots of a monic polynomial with
+algebraic integer coefficients, are again integral. The same induction 
+argument then
+shows that all traces of $k$--fold products of the $g_i$ 
+are in the ring of integers of $K_1$.
+\end{proof}
+
+Theorem \ref{genset} enables us to compute the trace field of $\Gamma
+= <\! g_1,\ldots,g_n\! >$. There is no particularly obvious set of
+generators for $\Gamma^{(2)}$ which we can use to compute the
+invariant trace field of $\Gamma$. Fortunately, Corollary~3.2 of
+\cite{hlm} tells us that $\Q(\tr\Gamma^{(2)}) = \Q(\tr\Gamma^{SQ})$ where
+$\Gamma^{SQ} = <\!  g_1^2,\ldots,g_n^2\! >$, as long as $\tr(g_i)\neq
+0$, for $i=1,\ldots,n$.
+
+Snap computes trace fields and invariant trace fields in much the same
+way that it computes a field containing all the shape parameters. It
+first computes high precision numeric expressions for a set of generators
+for the group of covering transformations of a manifold. Then it uses
+LLL to find a primitive element in terms of which the appropriate set
+of traces can be expressed. 
+
+For example: $(6,1)$--Dehn filling on the figure 8 knot complement
+yields a closed hyperbolic 3-manifold with volume
+$1.284485300468\ldots$. Its group of covering transformations is $<\!
+g_1, g_2\!>$ with
+\begin{gather*}
+g_1 \approx 
+\left( \begin{matrix}
+-1.135368+0.572291 i & 0.0 \\
+0.702328+0.354014 i & -0.702328-0.354014 i
+\end{matrix}\right),\\
+g_2\approx
+\left( \begin{matrix}
+-1.226699+1.467712 i & 2.689343+1.705870 i \\
+-0.265154+0.168189 i & 0.0
+\end{matrix}\right).
+\end{gather*}
+
+Snap prints the invariant trace field as follows:
+\begin{verbatim}
+ Invariant trace field
+ minumum polynomial: x^3 + 2*x - 1
+ root number: 2
+ numerical value of root: -0.2266988257582018 + 1.467711508710224*i
+ signature: [1, 1]
+ discriminant: -59
+  ...
+\end{verbatim}
+It also gives exact expressions for the traces used to generate this
+field: 
+\begin{verbatim}
+ Invariant trace field generators
+ tr(g1^2) = mod(-x^2 - x - 1, x^3 + 2*x - 1)
+ tr(g2^2) = mod(x^2 - 2*x - 1, x^3 + 2*x - 1)
+ tr(g1^2g2^2) = mod(-x + 2, x^3 + 2*x - 1)
+
+\end{verbatim}
+
+This is all very well but there is not much point in computing
+invariants, like the invariant trace field, if we cannot compare two
+and decide whether they are the same or different. Simple invariants
+of a number field include its degree (dimension over $\Q$), which is
+equal to the degree of the minimum polynomial of any primitive
+element, and its signature $(r_1,r_2)$, where  $r_1$ is the number of 
+real roots, and $r_2$ is the number of conjugate
+pairs of non-real roots of a minimum polynomial. 
+
+We also have the {\em discriminant}. The algebraic integers of a
+number field $\Q(\tau)$ form a free $\Z$--submodule of $\Q(\tau)$
+of rank $[\Q(\tau):\Q]$.  The bilinear map $(x,y)\mapsto \tr(xy)$
+gives a nondegenerate inner product on $\Q(\tau)$ as a $\Q$--vector
+space. Given any basis of the ring of integers we form the matrix of
+inner products of basis elements, taken pairwise. The determinant of
+this is in $\Z$ and is independent of the choice of basis. It is
+called the discriminant of the number field. 
+
+In fact we can construct a {\em canonical minimum polynomial} 
+which is a complete isomorphism invariant for number fields. 
+The so-called $T_2$ norm of
+a number field is given by the
+the inner product
+$$(x,y) \mapsto  \sum_{i=1}^n \sigma_i(x)\overline{\sigma_i(y)},$$
+where  $\sigma_1 , \ldots, \sigma_n$ are the embeddings of
+the number field $\Q(\tau)$ into $\C$, and the bar denotes ordinary 
+complex conjugation. 
+This gives a positive definite inner product
+on $\Q(\tau)$, and we can enumerate integers of $\Q(\tau)$ in order of
+their $T_2$ norm. The set of integers of smallest norm 
+that generate $\Q(\tau)$
+is canonical. Their minimum polynomials include one which
+is lexicographically first, and this serves as a canonical
+minimum polynomial.  See \cite{cohen} for further discussion.
+
+The trace fields we compute are not just abstract number fields, they
+are actually subfields of $\C$. Complex conjugate
+subfields arise from complex conjugate representations in
+$\psl2c$ of the same fundamental group, and just correspond to reversing the
+orientation of a hyperbolic 3-manifold.  Otherwise
+different subfields mean essentially different values of the invariant. 
+Since several roots of the
+canonical minimum polynomial might generate the same subfield of $\C$,
+we sort the roots into some fixed order and take the first which gives
+the required subfield. This gives us a {\em canonical root number}
+for the subfield%
+\footnote{
+\label{rootnumbers}
+In fact, we make an {\em ordered list} of the real roots followed by the
+complex roots having positive imaginary part; these are arranged in 
+increasing order of real part and increasing absolute value 
+of imaginary part (if real parts are equal).
+We then try each real root in turn (if the field is real) or 
+each complex root followed by its complex conjugate (if the field is non-real).
+Finally, we assign the root a number: if the root has non-negative real
+part we give its position in the list, 
+otherwise we give the negative of the number for its conjugate.}.
+
+For example: in the Hodgson-Weeks census of low-volume, closed,
+hyperbolic 3-manifolds, the manifolds denoted {\hbox{m010}(-1,3)} and
+{\hbox{s594}(-4,3)} have isomorphic invariant trace fields, with
+canonical minimum polynomial $x^4 + x^2 - x + 1$, {\em but} they have
+different canonical root numbers, namely 1 and 2
+respectively. Therefore their invariant trace fields differ and they
+are not commensurable.
+
+\subsection{The invariant quaternion algebra}
+
+\def\eqn{aX^2 + bY^2 - Z^2 = 0}
+
+Let $K$ be a field of characteristic zero. A {\em quaternion algebra over}
+$K$ is a simple central algebra of dimension 4 over $K$. These are discussed
+in detail in \cite{vigneras}.
+Let $(a,b)$
+be a pair of nonzero elements of $K$. Up to isomorphism, there is a
+unique quaternion algebra $A$ containing elements $i,j$ satisfying $i^2 =
+a, j^2 = b$, and $ij = -ji$, and such that $\{1,i,j,ij\}$ form a basis
+for $A$ as a $K$--vector space. Such a pair $(a,b)$ is called a {\em Hilbert
+symbol} for $A$. Every quaternion algebra over $K$ has a Hilbert
+symbol, but the symbol is far from being unique. 
+
+$A$ is a division algebra if and only if the equation $\eqn$ has no
+non-trivial solutions for $X,Y,Z\in K$. If $A$ is not a division
+algebra, it is isomorphic with $M(2,K)$, the algebra of all $2$ by $2$ matrices
+over $K$ (and conversely, the latter is not a division algebra for any
+$K$). Over $\R$ there are just two quaternion algebras: the ``usual''
+Hamiltonian quaternion algebra, which has Hilbert symbol $(-1,-1)$ and
+is a division algebra, and $M(2,\R)$. Over $\C$ there is just
+$M(2,\C)$.
+
+
+As before, let $M = \H^3/\Gamma$ be a finite volume, orientable
+hyperbolic 3-manifold. Let $\tilde{\Gamma}^{(2)}$ be the preimage in
+$\sl2c$ of the group generated by squares of elements of 
+$\Gamma \subset \psl2c$. The
+{\em invariant quaternion algebra $A(\Gamma)$ of $\Gamma$}, is the
+$k$--subalgebra of $M(2,\C)$ generated by $\tilde{\Gamma}^{(2)}$,
+where $k$ denotes the invariant trace field of $\Gamma$. 
+
+\begin{theorem}[See \cite{hlm}]
+Let $g,h$ be non-commuting elements of $\Gamma^{(2)}$ with
+$\tr(g)\neq \pm 2$. 
+Then $A(\Gamma)$ has Hilbert symbol
+$$
+(\tr(g^2) - 2, \tr([g,h]) - 2),
+$$
+where $[g,h]$ denotes the commutator $ghg^{-1}h^{-1}$. 
+\end{theorem}
+
+Snap computes a Hilbert symbol for the invariant quaternion algebra of
+a 3-manifold by finding $g,h\in \Gamma^{(2)}$ as above, and computing
+exact expressions for $\tr(g^2) - 2$ and $\tr([g,h]) - 2$. The
+non-uniqueness of the Hilbert symbol means that this is not, by itself,
+enough to tell us whether or not two 3-manifolds have the same
+quaternion algebra. 
+
+The remainder of this section describes how the classification of
+quaternion algebras over a number field gives a complete invariant
+which we can compute. 
+We fix a number field $K$, and quaternion algebra $A$ over
+$K$ with Hilbert symbol $(a,b)$.
+
+
+\begin{theorem}[See \cite{vigneras}]
+Let $K$ and $A$ be as above. The
+isomorphism class of $A$ is determined by the (finite) set of real and
+finite places of $K$ at which $A$ is ramified. The total number of
+places, real and finite, at which $A$ ramifies, is even. 
+\end{theorem}
+
+Recall that a {\em place} of a number field $K$ is an equivalence
+class of absolute values $|.|:K\rightarrow \R$. A place is called {\em real}
+(resp.\ {\em complex}) if the completion of $K$ with respect to $|.|$ is
+isomorphic with $\R$ (resp.\ $\C$). The real (resp.\ complex) places
+of $K$ are in one-to-one correspondence with embeddings
+$\sigma:K\rightarrow \R$ (resp.\ conjugate pairs of non-real embeddings
+$\sigma:K\rightarrow \C$). 
+
+A place is called {\em finite} if it arises from a valuation
+$v:K^*=K-\{ 0\} \rightarrow \Z$, 
+i.e.\ there is a real number $\lambda \in (0,1)$
+such that $|x| = \lambda^{v(x)}$ for all $x\in K^*$.
+These valuations, in turn, are in one-to-one correspondence with
+prime ideals of $\Z_K$, the ring of integers of $K$: if $\p$ is a
+prime ideal of $\Z_K$, then for each $x\in K^*$, let $v_{\p}(x) = r$ where $r$
+is the unique integer such that $x\in \p^r - \p^{r+1}$. 
+
+\def\Kbar{\overline{K}}
+
+For a fixed place of $K$, let $\sigma:K\rightarrow \Kbar$ denote the
+embedding of $K$ into its completion. Then $A\otimes_{\sigma}\Kbar$ is
+a quaternion algebra over $\Kbar$.  $A$ is said to be {\em ramified at
+$\sigma$} if $A\otimes_{\sigma}\Kbar$ is a division algebra. In
+general, over a complete field with absolute value (e.g.\ $\R$), there
+exists at most one quaternion division algebra.
+
+Computing the real ramification of $A$ is straightforward:
+$A\otimes_{\sigma}\R$ has Hilbert symbol $(\sigma(a),
+\sigma(b))$. Therefore $A$ is ramified at $\sigma$ if and only if both
+$\sigma(a)$ and $\sigma(b)$ are negative.
+
+\def\Kp{K_{\p}}
+
+For the remainder of this section we consider the problem of computing
+the finite ramification of $A$. Slightly different notation is
+convenient. 
+Let $\p\subset\Z_K$ be a prime ideal and let $\Kp$ denote the
+corresponding completion of $K$. We regard $K$ as a
+subfield of $\Kp$, omitting any explicit mention of an embedding. 
+Finally, we write $A_{\p}$ for $A\otimes\Kp$. 
+
+\begin{proposition} \label{hilsym}
+Let $K$, $A$ and $(a,b)$ be as above. 
+Let $\p\not\:\mid 2$ be a prime ideal of $\Z_K$. Then
+$A_{\p}$ is a division algebra if and only if none of $a, b$ and $-ab$ are
+squares in $\Kp$. If $a, b$ and $-ab$ all have even $\p$-adic
+valuation, at least one of them is a square. 
+\end{proposition}
+
+\begin{proof}
+See Lemma~II.1.10 and the table following it in \cite{vigneras}.
+(Note that Vigneras uses the notation $\{a,b\}$ for our Hilbert
+symbol $(a,b)$.)
+\end{proof}
+
+\def\Otil{\overline{\Z_K}}
+
+This proposition has two useful consequences. Firstly, that the
+finite ramification of $A$ is restricted to the finite set of 
+primes $\p$ dividing $2ab$.
+Secondly, for primes $\p$ not dividing $2$, the question of whether $A$ is
+ramified reduces to determining whether
+certain $c\in K$ are squares in $K_{\p}$. Proposition~\ref{qr} settles
+this question for us. The proof uses Hensel's Lemma \cite[page 42]{lang},
+which is valid for any prime
+$\p\subset \Z_K$, and corresponding absolute value $|x | = \lambda^{v_{\p}(x)}$. 
+Here, $\Otil$  refers to the closure of $\Z_K$ in $\Kp$. 
+
+\begin{lemma}[Hensel] \label{hensel}
+Let $f(X)$ be a polynomial in $\Z_K[X]$. Let $x_0$ be an element of $\Z_K$
+such that $|f(x_0)| < |f'(x_0)^2|$, where $f'$ denotes the formal
+derivative of $f$. Then $f$ has a root $x$ in $\Otil$ such that 
+$|x - x_0| < 1$.
+\end{lemma}
+
+\begin{proposition} \label{qr}
+For each $c\in K^*$ 
+and prime $\p\subset\Z_K$ there exists
+$w\in K^*$ such that $cw^2 \in \Z_K$ and $v_{\p}(cw^2) \in \{0,1\}$.
+Suppose now $\p\not\:\mid 2$.
+Then $c$ is a square in $\Kp$ if and only if $v_{\p}(cw^2) = 0$ and $cw^2$ projects to
+a square in the finite field $\Z_K/\p$. 
+\end{proposition}
+
+\begin{proof}
+Let $w_1\in \Z_K$ be the denominator of $c$. Then $cw_1^2\in \Z_K$.
+By the Chinese Remainder Theorem, we can find an element $u\in K^*$
+such that $v_{\p}(u) = -1$ while $v_{\q}(u)\geq 0$ for all prime
+ideals $\q \neq \p$.  Then $w = w_1 u^m$, where 
+$m$ is the integer part of  $v_{\p}(cw_1^2)/2$, 
+has the required property.
+
+Let $c' = cw^2$. Let $f(X) = X^2 - c'$.  
+If $v_{\p}(c') = 0$ and $c'$ projects to a square
+in $\Z_K/\p$ we can lift a square root to obtain $x_0\in \Z_K$ such
+that $f(x_0)\in \p$ while $f'(x_0) = 2x_0 \not\in \p$.
+Lemma~\ref{hensel} then implies that $c'$ is a square in $\Kp$.
+
+Conversely, if $c' = x^2$ for some $x \in \Kp$, $v_{\p}(c') = 0$ and $x$
+projects to a square root of the projection of $c'$ in $\Z_K/\p$. 
+\end{proof}
+
+We turn now to the case $\p\mid 2$. Recall that 
+$A_{\p}$ is a division algebra if
+and only if the equation $\eqn$ has no non-trivial solution for $X,Y,Z
+\in \Kp$. Denote by $e > 0$ the $p$-adic valuation of $2$, i.e. $e =
+v_{\p}(2)$, or equivalently, $|2| = \lambda^e$. (This $e$ is in fact the
+ramification index of the field extension $K/\Q$ at $\p$.) We omit the
+easy proof of the following lemma.
+
+\begin{lemma} \label{approx}
+Let $X,X'\in \Kp$ and suppose $|X| \leq 1$ and $|X - X'| \leq \lambda^k$ for
+some non-negative integer $k$. Then $|X^2 - {X'}^2| \leq
+\lambda^{\min\{k+e,2k\}}$.
+\end{lemma}
+
+Multiplying $a$ and $b$ by suitable squares if necessary, by the first part of
+Proposition~\ref{qr}, we can assume $a,b\in \Z_K$ and $v_{\p}(a),
+v_{\p}(b) \in \{0,1\}$.
+
+\begin{proposition} \label{lifting}
+Let $a,b \in \Z_K$ be such that $v_{\p}(a), v_{\p}(b) \in \{0,1\}$. 
+Let $R$ be a finite set of representatives for the ring $\Z_K /
+\p^{e+3}$, where $e = v_{\p}(2)$. The equation
+\begin{equation}
+aX^2 + bY^2 - Z^2 = 0 \label{hilbert}
+\end{equation}
+has a solution for $X,Y,Z \in \Kp$, if and only if there exist elements
+$\Xp,\Yp,\Zp \in R$ such that $|a\Xp^2 + b\Yp^2 - \Zp^2| \leq \lambda^{2e+3}$ and
+$\max\{|\Xp|,|\Yp|,|\Zp|\} = 1$.
+\end{proposition}
+
+\begin{proof}
+Let $(X,Y,Z)$ be a solution of (\ref{hilbert}) in $\Kp$. Multiplying
+through, if necessary, by a suitable power of a uniformizing element
+$\pi$ with $v_{\p}(\pi) = 1$, 
+we can assume
+$X,Y,Z \in \Otil$ and $\max\{|X|,|Y|,|Z|\} = 1$. Since $\Z_K$ is dense
+in $\Otil$, and $R$ is $\lambda^{e+3}$-dense in $\Z_K$, we can choose $\Xp,\Yp,\Zp
+\in R$ such that $|X - \Xp|,|Y - \Yp|,|Z - \Zp| \leq \lambda^{e+3}$. By
+Lemma~\ref{approx}, $|a\Xp^2 + b\Yp^2 - \Zp^2| \leq \lambda^{2e+3}$. 
+
+Conversely, let $\Xp,\Yp,\Zp \in R$ be such that $|a\Xp^2 + b\Yp^2 - \Zp^2|
+\leq \lambda^{2e+3}$ and $\max\{|\Xp|,|\Yp|,|\Zp|\} = 1$. If $|\Xp| = 1$ then
+$|2a\Xp| \geq \lambda^{e+1}$, and therefore $|a\Xp^2 + b\Yp^2 - \Zp^2| <
+|2a\Xp|^2$. Regarding $a\Xp^2 + b\Yp^2 - \Zp^2$ as a polynomial in $\Xp$
+alone, by Lemma~\ref{hensel} there exists $X\in\Otil$ such that $aX^2 +
+b\Yp^2 - \Zp^2 = 0$. The same argument applies if $|\Yp| = 1$ or $|\Zp| =
+1$. Since at least one of the three cases must hold, the result follows. 
+\end{proof}
+
+Propositions~\ref{hilsym}, \ref{qr} and \ref{lifting} reduce the
+task of computing the finite ramification of a quaternion algebra over
+a number field to a finite number of steps. We remark that the details
+of these computations are readily handled by Pari. In particular,
+Pari has functions for factoring algebraic numbers and ideals into
+primes, and for computing valuations. The uniformizing element and the
+element $u$, invoked in the proof of Proposition~\ref{qr}, are
+constituent parts of Pari's way of representing a prime ideal (and
+are thus readily available).
+
+\begin{remark}
+For an invariant quaternion algebra $A = A(\Gamma)$,
+the calculation of finite ramification
+can sometimes be simplified by using the following observation from
+\cite{gmmr}. Assume that all traces of elements in $\Gammatil$ 
+are algebraic {\em integers}, and  
+let $g,h$ be non-commuting loxodromic elements of $\Gammatil^{(2)}$.
+Then any prime $\p$ which ramifies the quaternion algebra $A$ must 
+divide $\tr([g,h]) - 2$, where $[g,h]$ denotes the commutator $ghg^{-1}h^{-1}$. 
+\end{remark}
+
+\subsection{Arithmeticity}
+Finally we describe the ``arithmetic'' construction of Kleinian groups
+of finite co-volume. Let $A$ be a quaternion algebra over a number
+field $K$. The integers of $A$, i.e.\ elements of $A$ which have
+a monic
+minimum polynomial with integral coefficients over $K$, do not in
+general form a subring of $A$. The analogous role in $A$, to that of
+$\Z_K$ in $K$, is now played by an order of $A$. An {\em order} $\O$
+of $A$ is a rank 4 $\Z_K$-submodule of the set of 
+integers of $A$, containing $1_A$, and
+closed as a subring of $A$. Orders always
+exist but are not generally unique. The units $\O^1$ of $\O$ form a
+multiplicative subgroup. For each real or complex place
+$\sigma$ of $K$, $\sigma$ induces a map of $A$ into $\H$, $M(2,\R)$ or
+$M(2,\C)$. If $K$ has precisely one complex place, and every real
+place is ramified (i.e.\ maps $A$ into $\H$), then the image of $\O^1$
+in $M(2,\C)$ is a discrete subgroup of $SL(2,\C)$ of finite
+co-volume. This group is said to be {\em derived
+from a quaternion algebra.} A subgroup $\Gamma$ of $SL(2,\C)$ is {\em
+arithmetic} if it is commensurable with one derived from a quaternion
+algebra. The $K$ and $A$ of the construction can be recovered as the
+invariant trace field, and invariant quaternion algebra respectively,
+of $\Gamma$. 
+
+\begin{remark}
+This is not really {\em the} definition of arithmeticity; there
+is a much more general definition in the context of lattices in
+semi-simple Lie groups. It is a result of Borel that the above
+construction yields all the arithmetic subgroups of $SL(2,\C)$. 
+\end{remark}
+
+A result of Reid \cite{reidphd} (see also \cite{tak}, \cite{hlm}), 
+shows that a discrete subgroup $\Gamma$ of $SL(2,\C)$ is
+arithmetic if and only if the following conditions are satisfied:
+\begin{enumerate}
+\item The invariant trace field $k = \Q(\tr\Gamma^{(2)})$, has exactly
+one complex place.
+\item $A(\Gamma)$ is ramified at every real place of $k$.
+\item $\Gamma$ has integer traces (which is equivalent to
+$\tr\Gamma^{(2)} \subseteq \Z_k$).
+\end{enumerate}
+This enables us to determine 
+whether or not hyperbolic 3-manifolds are arithmetic.
+(See Tables~\ref{lowvolclosed} and \ref{algebras}
+for some examples.)
+
+Arithmetic subgroups of $\sl2c$ are commensurable if and only if
+they have the same invariant quaternion algebra. Therefore the
+arithmetic manifolds grouped together in Table~\ref{algebras}
+are commensurable. Non-arithmetic manifolds with the same invariant
+trace field, quaternion algebra and integrality or otherwise of
+traces, may still be incommensurable. It is work in progress to find
+a {\em computable,} complete commensurability invariant for the
+non-arithmetic case. 
+
+\begin{example}\label{twinsex}
+
+The paper \cite{BPZ} describes an interesting family of 
+hyperbolic ``twins'' --- pairs of non-homeomorphic 
+closed hyperbolic 3-manifolds with the same volume. 
+These examples are obtained by Dehn filling on the
+manifold denoted $\hbox{m009}$ in SnapPea's notation;
+this is the once-punctured torus bundle over $S^1$
+with monodromy given by the matrix
+$
+\left[ \begin{matrix}
+3 & 2 \\                                     
+1 & 1                     
+\end{matrix}\right]
+$.
+We use the geometric choice of
+basis for homology of the boundary torus 
+consisting of shortest geodesic and next shortest independent geodesic
+on a horospherical torus cross section. 
+Then the Dehn fillings $\hbox{m009}(p,q)$ and $\hbox{m009}(-p,q)$
+give non-homeomorphic closed manifolds of equal hyperbolic volume,
+for each pair of relatively prime integers $(p,q)$,
+except for the 8 non-hyperbolic Dehn fillings $(\pm 3,1), (\pm 2,1),
+(\pm 1,1), (0,1)$, and $(1,0)$.
+
+In Problem 3.60(H) of \cite{kirby}, Pzrzytycki asked if
+these pairs are commensurable. Using Snap, we find that
+these pairs of manifolds generally have the isomorphic invariant trace fields,
+but have different invariant quaternion algebras
+so are not commensurable. However, there is one pair,
+$\hbox{m009}(5,1)$ and $\hbox{m009}(-5,1)$, which are arithmetic manifolds
+of volume $1.8319311883544380\ldots$
+with the same invariant quaternion algebra, hence are commensurable.
+Table \ref{twins} shows some arithmetic data
+for the lowest volume twins. (The descriptions of invariant trace field
+and quaternion algebras are explained in section \ref{tables} below.)
+\end{example}
+
+\begin{table}[h] 
+\centering
+\begin{tabular}{|>{\PreserveBackslash\raggedright}p{3.2cm}|l| %
+	>{\PreserveBackslash\raggedright}p{3.5cm}|
+	>{\PreserveBackslash\raggedright}p{3.0cm}|l|}
+
+\hline
+
+\hbox{Manifold} Volume  & Homology & Invariant trace field  & Quaternion algebra & Int/Ar\ \\
+
+\hline 
+
+%1.4140610441653916              Z/6  0.0766020666485759  0.794134662992  m009( 4, 1)    
+ m009( 4, 1) 
+ 1.4140610441653916  &$\Z/6$  &
+\hbox{$x^3 - x^2 + 1$} 
+[1, 1] (2) &
+\hbox{$(5, x-2)$} [1]&
+$1/1$ \\
+
+\hline 
+
+%1.4140610441653916             Z/10 -0.1182687333152426  0.364894686526  m009(-4, 1)    
+ m009(-4, 1) 
+1.4140610441653916    &$\Z/10$ &
+\hbox{$ x^3 - x^2 + 1$} 
+[1, 1] (-2) &
+\hbox{$(19, x-3)$} [1]&
+$1/1$ \\
+
+\hline 
+
+%1.8319311883544380        Z/2 + Z/4  0.0625000000000000  0.530637530953  m009( 5, 1)    
+ m009( 5, 1) 
+ 1.8319311883544380  &$\Z/2 + \Z/$4&
+\hbox{$ x^2 + 1$} 
+[0, 1] (1) &
+\hbox{$(2, x+1) (5,x+2)$} [~] &
+$1/1$ \\
+
+\hline
+
+%1.8319311883544380        Z/2 + Z/6 -0.1041666666666667  0.481211825060  m009(-5, 1)    
+m009(-5, 1)
+1.8319311883544380    &    $\Z/2 + \Z/6$ &
+\hbox{$ x^2 + 1$} 
+[0, 1] (1) &
+\hbox{$(2, x+1) (5,x+2)$} [~] &
+$1/1$ \\
+
+\hline
+
+%1.8435859723266779              Z/6  0.2233269246580219  0.477961349958  m009(-1, 2) 
+m009(-1, 2)
+1.8435859723266779     &         $\Z/6$ &
+\hbox{$x^5 - 2x^4 - 2x^3 + 4x^2 - x + 1$} 
+[3, 1] (-4) &
+\hbox{$(2,x^2+x+1) (5,x+1)$} [1,2]&
+$1/0$ \\
+
+
+\hline
+%1.8435859723266779              Z/2  0.2350064086753114  0.480433913874  m009( 1, 2)
+ m009( 1, 2)
+ 1.8435859723266779      &        $\Z/2$  & 
+\hbox{$x^5 - 2x^4 - 2x^3 + 4x^2 - x + 1$} 
+[3, 1] (4) &
+[1,2] &
+$1/0$ \\
+
+
+\hline
+%1.9415030840274678             Z/10  0.2124785362605743  0.425721998618  m009(-3, 2)
+m009(-3, 2)
+1.9415030840274678       &      $\Z/10$  &
+\hbox{$x^5 - x^4 - 2x^3 - x^2 + 2x + 2$} 
+[3, 1] (4) &
+\hbox{$(2,x) (19,x+2)$} [2,3]&
+$1/0$ \\
+    
+
+\hline
+%1.9415030840274678              Z/2  0.2458547970727590  0.464306096866  m009( 3, 2)
+m009( 3, 2) 
+1.9415030840274678       &     $\Z/2$ &
+\hbox{$x^5 - x^4 - 2x^3 - x^2 + 2x + 2$} 
+[3, 1] (-4) &
+\hbox{$(2,x) (2,x^3+x^2+1)$} [2,3]&
+$1/0$ \\
+
+\hline
+%2.0624516259038381             Z/10  0.0516817236776574  0.377933762621  m009( 6, 1) 
+m009( 6, 1)
+2.0624516259038381       &      $\Z/10$ &
+\hbox{$x^5 - x^4 + x^3 + 2x^2 - 2x + 1$} 
+[1, 2] (-2) &
+\hbox{$(2,x+1)  (19,x+9)$} {$(2,x^3+x^2+1)$}\ \ \  [1]&
+$1/0$ \\
+
+\hline
+%2.0624516259038381             Z/14 -0.0933483903443241  0.377933762621  m009(-6, 1) 
+m009(-6, 1) 
+2.0624516259038381       &    $\Z/14$ &
+\hbox{$x^5 - x^4 + x^3 + 2x^2 - 2x + 1$} 
+[1, 2] (2) &
+\hbox{$(2,1+x)$} [1]&
+$1/0$ \\
+
+\hline
+%2.1340163368014022             Z/14  0.2059468384760179  0.368422300349  m009(-5, 2)
+ m009(-5, 2)
+2.1340163368014022       &     $\Z/14$ &
+\hbox{$x^5 - 3x^3 - 2x^2 + 2x + 1$}
+[3, 1] (4) &
+\hbox{$(71,x-11)$} [1,3]&
+$1/0$ \\
+    
+
+\hline
+%2.1340163368014022              Z/6 -0.2476135051426846  0.368422300349  m009( 5, 2)
+m009( 5, 2) 
+2.1340163368014022      &        $\Z/6$ &
+\hbox{$x^5 - 3x^3 - 2x^2 + 2x + 1$}
+[3, 1] (-4) &
+\hbox{$(2) (5,x-2)$} [1,3]&
+$1/0$    \\
+
+\hline
+
+\end{tabular}
+\caption{A family of pairs of closed manifolds with equal volume}
+\label{twins}
+\end{table}
+
+\def\snap{{Snap}}\def\snappea{{SnapPea}}
+\def\Bloch{\mathcal B}
+\def\Prebloch{\mathcal P}
+\def\CS{\operatorname{CS}}
+\def\cs{\operatorname{cs}}
+\def\vol{\operatorname{vol}}
+\section{Chern-Simons Invariant and Eta Invariant}
+
+The eta-invariant $\eta(M)$ and the Chern-Simons invariant $\cs(M)$
+are geometrically defined invariants of an hyperbolic $3$-manifold
+$M$.  These invariants often take rational values, but are
+conjecturally ``usually'' transcendental (a precise conjecture is in
+\cite{neumann-yang1}).  \snap\ computes these invariants to high
+precision. The Chern-Simons invariant is also computed (to lower
+precision) by \snappea.  In the following two subsections we say
+in more detail what these invariants are and how \snap\ computes them.
+
+In the versions\footnote{There are two commonly used normalizations of
+Chern-Simons invariant in the literature related by
+$\cs(M)=\frac1{2\pi^2}\CS(M)$. Although the invariants are usually
+defined for compact $M$ we allow cusps, see below.} we consider, the
+eta-invariant $\eta(M)$ is a real invariant while the Chern-Simons
+invariant $\cs(M)$ is defined modulo $\frac12$.  Moreover, the
+Chern-Simons invariant is determined by the eta-invariant: $\cs(M)$ is
+simply $\frac32\eta(M)$ (mod $\frac12$).
+
+Why do we bother with $\cs(M)$, given that it is immediately determined by
+$\eta(M)$?  A first reason is that $\cs(M)$ is somewhat easier to
+compute. Secondly, $\cs(M)$ also has algebraic significance; it is
+closely tied to the Bloch invariant, an algebraic/number-theoretic
+invariant which we describe in the next section.
+
+A less significant reason is that $\cs(M)$ multiplies by degree in
+coverings, so it is a tool for commensurability questions. However, the
+behaviour of $\eta(M)$ for coverings is also well understood (and
+related to other interesting invariants, see e.g.,
+\cite{atiyah-patodi-singer2, neumann1}).
+
+\subsection{Chern-Simons Invariant}
+
+The Chern-Simons invariant $\cs(M)$ is defined for any compact
+$(4k-1)$-dimensional Riemannian manifold $M$ and is an obstruction to
+conformal immersion of $M$ in Euclidean space \cite{chern-simons}. It
+is the integral of a certain $(4k-1)$-form that is defined in terms of
+curvature. (More generally, the Chern-Simons invariant is an invariant
+of a connection on a manifold and our $\cs(M)$ is the Chern-Simons
+invariant for the Riemannian connection on the tangent bundle of $M$).
+
+For hyperbolic 3-manifolds Meyerhoff \cite{meyerhoff} extended the
+definition of $\cs(M)$ to allow $M$ to have cusps. The point is that
+if $M'$ is a compact manifold obtained by Dehn filling $M$ then
+$\cs(M')$ is naturally the sum of a term that varies analytically on
+hyperbolic Dehn filling space and a discontinuous summand
+($-\frac1{2\pi}$ times the sum of torsions of the geodesics added by Dehn
+filling), see \cite{nz} and \cite{yoshida}. So one defines
+$\cs(M)$ as the value of the analytic term at the complete hyperbolic
+structure on $M$.
+
+This leads to an invariant $\cs(M)$ of a hyperbolic 3-manifold $M$ in
+$\R/\frac12\Z$. If $M$ is closed the Chern-Simons invariant is well
+defined modulo $1$, but \snap\ and \snappea\ still only compute modulo
+$\frac12$.  This is no real loss, since the Chern-Simons invariant of
+a closed manifold $M$ modulo $1$ can also be computed from the first
+homology of $M$ together with the eta-invariant $\eta(M)$, both of
+which \snap\ can also compute.
+
+Another significance of $\cs(M)$ for a hyperbolic 3-manifold is that it
+has natural analytic relation to $\vol(M)$. In fact $\vol(M) +
+2\pi^2i\cs(M)$ is a natural complexification of $\vol(M)$ and the formulae
+one uses to compute $\cs(M)$ give $\vol(M)$ as well.
+
+The method of computation used by \snap\ and \snappea\ is as follows.
+Recall that these programs compute using ideal triangulations. Let $M$
+be a cusped hyperbolic $3$-manifold with ideal triangulation and
+$M(p,q)$ the result of hyperbolic Dehn surgery on some chosen cusp of
+$M$, triangulated by deformed versions of the original tetrahedra.  In
+\cite{neumann2} Neumann gave a formula for $\cs(M(p,q))+\alpha$,
+where $\alpha$ is a constant, in terms of the simplex parameters of
+these deformed ideal tetrahedra.  The constant $\alpha$ is unknown,
+but is independent of $p$ and $q$. Thus if the exact Chern-Simons
+invariant is known for just one of the manifolds $M(p,q)$ then
+$\alpha$ can be deduced, so $\cs(M(p,q))$ can be computed for all the
+$M(p,q)$. As one computes $\cs(M)$ for more manifolds one has more
+reference points to compute new families of values.  Using this
+``bootstrapping'' procedure Weeks and Hodgson computed $\cs(M)$ for the
+data-bases of manifolds in \snappea.  The computed values are included
+in \snappea\ so that they are available for further Dehn surgeries.
+
+In fact the constant $\alpha$ is always an integer multiple of
+$1/24$ in the version of the formula that \snap\ uses (this was
+conjectured in \cite{neumann2} but has since been proved, see
+\cite{neumann-in-progress} or the announcement in
+\cite{neumann-hilbert}). Thus \snap\ can compute the high precision
+value of $\cs(M)$ up to a multiple of $1/24$ and this multiple can
+then be determined from \snappea's lower precision value.  An improved
+formula that computes $\cs(M)$ exactly is now known (loc.\ cit.). This
+avoids the need of the bootstrapping procedure and will eventually be
+implemented in \snap.
+
+\subsection{Eta-Invariant}
+
+The eta-invariant $\eta(M)$ is also defined for any closed oriented
+Riemannian $(4k-1)$-manifold. It was initially defined by Atiyah,
+Patodi and Singer as a measure of the ``asymmetry'' of the spectrum of
+the Laplacian on $M$, but they proved \cite{atiyah-patodi-singer2} that
+it can also be given by the following formula:
+\def\sign{\operatorname{sign}}
+$$\eta(M):=
+\int_XL - \sign(X), 
+$$
+where:
+
+\noindent$\bullet$~~~~$X$ is any Riemannian $4k$-manifold with $\partial X
+= M$ such that the metric on some collar neighbourhood of
+$\partial X$ is isometric to the product metric on
+$M\times[0,\epsilon)$,
+and 
+
+\noindent$\bullet$~~~~$L$ is the Hirzebruch $L$-class as a
+$4k$-form on $X$, defined in terms of curvature as in, for example,
+the appendix to \cite{milnor-stasheff}. 
+
+The Hirzebruch index theorem tells one that the above formula gives
+zero for a closed manifold $X$ and it is then a standard argument to
+see that it gives an invariant of $M$ that does not depend on the
+choice of $X$ when $X$ has boundary $M$ as above.  If $k>1$ then $M$
+may not be the boundary of any $X$, but the disjoint union $2M$ of $2$
+copies of $M$ is a boundary, so this formula can be used to define
+$\eta(2M)$, and hence define $\eta(M)$ as $\frac12\eta(2M)$.
+
+The relation of $\eta(M)$ to $\cs(M)$ for a compact $3$-manifold $M$
+is (\cite{atiyah-patodi-singer2}): $$3\eta(M) \equiv
+2\cs(M)+\tau\quad\text{(mod $2$)},$$ where $\tau$ is the number of
+$2$-primary summands of $H_1(M;\Z)$. Thus $\eta(M)$ completely
+determine $\cs(M)$ if $M$ has known homology.  There is also a cusped
+version of this --- Meyerhoff and Ouyang \cite{meyerhoff-ouyang}
+extended the definition of $\eta(M)$ to cusped $M$ for which one has
+chosen a basis of homology at each cusp.
+
+A formula for $\eta(M(p,q))$ in terms of ideal triangulations for
+manifolds $M(p,q)$ as described above was given in
+\cite{meyerhoff-neumann}, where it was proved ``locally'' (i.e., in a
+neighbourhood of the complete structure $M$ in analytic Dehn filling
+space). It was proved globally in \cite{ouyang}. The formula is a
+modification of Neumann's Chern-Simons formula by the addition of
+certain arithmetic terms.  Again, there is an undetermined constant
+that is independent of $p$ and $q$.  Thus the above bootstrapping
+procedure, which will no longer be needed for computing Chern-Simons
+invariant, is still needed to compute $\eta(M)$ through the tables
+maintained by \snap\ and \snappea.  For a manifold $M$ which has not
+yet been linked by a sequence of hyperbolic Dehn fillings and
+drillings (removing closed curves) to a manifold with known
+eta-invariant, \snap\ cannot compute $\eta(M)$. This still applies to
+most of the knot and link complements in the standard knot and link
+tables, for example.
+
+It is conjectured that the bootstrapping procedure will always work.
+That is:
+
+\begin{conjecture}
+Any two hyperbolic $3$-manifolds are related by a sequence of
+hyperbolic drillings and fillings.
+\end{conjecture}
+
+\snap\ and \snappea\ provide good facilities for searching for such
+sequences, so there is much experimental evidence for the conjecture.
+The emphasis here is \emph{hyperbolic} drilling and filling: that is,
+each drilling or filling should move between points in the appropriate
+analytic Dehn filling space.  Without this restriction the conjecture
+is easy, since every $3$-manifold is obtainable by Dehn surgery on
+some link in the $3$-sphere.
+
+\begin{remark}\label{CS remark}
+The formula mentioned earlier for $\cs(M)$ actually computes the
+Chern-Simons invariant for the natural flat connection 
+on the associated principal $\psl2c$-bundle over $M$
+rather than the
+Riemannian connection.  It is shown by Dupont and Kamber in
+\cite{dupont-kamber} that these are the same in $\R/\Z[\frac16]$.
+In that paper they were considering a more general situation and not
+aiming for best denominators, and Dupont informs us that their proof
+works without introducing denominators in the $3$ dimensional case that
+we are interested in.
+
+The equality of the Riemannian and flat Chern-Simons invariants also
+follows if one assumes the conjecture above.  Indeed, in
+\cite{yoshida} the formula we use to compute Chern-Simons is proved in
+the context of the Riemannian Chern-Simons invariant and in
+\cite{neumann-in-progress} it is proved for the flat Chern-Simons
+invariant.  Thus we have two formulae that differ at most by the
+unknown constant they contain, valid over the analytic Dehn filling
+space for $M$.  Thus the difference of Riemannian and flat
+Chern-Simons is constant on any analytic Dehn filling space.  It is
+zero for some examples, so if the bootstrapping conjecture is true,
+the bootstrapping procedure shows the difference is always zero.
+\end{remark}
+
+
+
+\def\snap{{Snap}}
+\def\snappea{{SnapPea}} 
+\def\Bloch{\mathcal B}
+\def\Borel{\operatorname{Borel}}
+\def\Prebloch{\mathcal P}
+\def\cs{\operatorname{cs}}
+\def\rank{\operatorname{rank}}
+\def\PSL{\operatorname{PSL}}
+
+\section{Bloch Invariant and PSL-Fundamental Class} 
+
+For details on what we discuss here see \cite{neumann-in-progress,
+neumann-yang2, neumann-yang3} or the expository article
+\cite{neumann-hilbert}. 
+
+\subsection{PSL-Fundamental Class} We first describe the
+``PSL-fundamental class'' of an hyperbolic $3$-manifold $M$. This is a
+homology class $[M]_{PSL}$ in the homology group $H_3(\psl2c;\Z)$,
+where we are taking homology of $\psl2c$ as a discrete group. If $M$
+has cusps, $[M]_{PSL}$ is only well defined up to an element of order
+2 in $H_3(\psl2c;\Z)$. We describe how we compute this invariant
+numerically later.
+
+Let $M=\H^3/\Gamma$ be a compact hyperbolic $3$-manifold. Then
+$H_*(\Gamma;\Z)=H_*(M;\Z)$, since $M$ is a $K(\Gamma,1)$-space. Thus
+$H_3(\Gamma;\Z)\simeq\Z$ with a natural generator given by the
+fundamental class of $M$. The inclusion $\Gamma\to\psl2c$ induces a
+map $H_3(\Gamma;\Z)\to H_3(\psl2c;\Z)$.
+
+\begin{definition} The \emph{PSL-fundamental class}
+$[M]_{PSL}\in H_3(\psl2c;\Z)$ is the image of the natural generator of
+$H_3(\Gamma;\Z)$ under the above map. \end{definition}
+
+If $M$ is non-compact the PSL-fundamental class is harder to define,
+and we postpone it. It lies in $H_3(\psl2c;\Z)/C_2$, where $C_2$ is a
+cyclic subgroup of $H_3(\psl2c;\Z)$ of order $2$. This cyclic subgroup
+exists and is unique by the next theorem. In our notation we will
+ignore this $C_2$ ambiguity and speak of $[M]_{PSL}\in H_3(\psl2c;\Z)$.
+
+Note that we can conjugate $\Gamma$ to lie in a subgroup $\PSL(2,K)$
+of $\psl2c$, where $K$ is a number field, and $[M]_{PSL}$ is then
+defined in $H_3(\PSL(2,K);\Z)$ (this has only been proved modulo
+torsion in the cusped case). Usually, the smallest $K$ for which one
+can do this will be a quadratic extension of the trace field of
+$\Gamma$ (and there are infinitely many such fields which work). The
+following theorem tells us that if we work modulo torsion then we can
+actually use the invariant trace field.
+
+This theorem summarises results of various people, see
+\cite{neumann-yang3} for more details.
+
+\begin{theorem}\label{various results}
+\begin{itemize}
+\item[1.]
+$H_3(\psl2c;\Z)$ is the direct sum of
+\begin{itemize}
+\item its torsion subgroup, isomorphic to $\Q/\Z$, and \item an
+infinite dimensional $\Q$ vector space (conjectured to be countable).
+\end{itemize}
+\item[2.] If $k\subset\C$ is a number field then
+$H_3(\PSL(2,k);\Z)$ is the direct sum of \begin{itemize}
+\item its torsion subgroup and
+\item $\Z^{r_2}$, where $r_2$ is the number of conjugate pairs of
+complex embeddings of $k$.
+\end{itemize} Moreover, the map $H_3(\PSL(2,k);\Z)\to H_3(\psl2c;\Z)$
+is injective modulo torsion.
+\item[3.] If $k$ is the invariant trace field of $M$ then some
+positive multiple of $[M]_{PSL}$ is in the image of
+$H_3(\PSL(2,k);\Z)\to H_3(\psl2c;\Z)$.
+\end{itemize}
+\end{theorem}
+
+In fact, one can show that, after possibly adding a torsion element,
+$2^{b+1}[M]_{PSL}$ is in the image of $H_3(\PSL(2,k);\Z)\to
+H_3(\psl2c;\Z)$, where $b=\rank H_1(\Gamma;\Z/2)$. Moreover the
+coefficient $2^{b+1}$ can be replaced by $1$ if $M$ has cusps. 
+
+\subsection{Invariants of the PSL-fundamental class} There is a
+homomorphism $$\hat c\colon H_3(\psl2c;\Z)\to\C/2\pi^2\Z$$ called the
+``Cheeger-Simons class'' (\cite{cheeger-simons}) whose real and
+imaginary parts give Chern-Simons invariant and volume: $$\hat
+c([M]_{PSL})= 2\pi^2\cs(M)+i\vol(M)\,.$$ ($\cs(M)$ is here appearing
+as the Chern-Simons invariant of the flat connection, as discussed in
+Remark \ref{CS remark}). We therefore denote the homomorphisms given
+in the obvious way by the real and imaginary parts of $\hat c$ by:
+$$\cs\colon H_3(\psl2c;\Z)\to \R/\Z\,,\qquad
+\vol\colon H_3(\psl2c;\Z)\to \R\,.$$
+
+\begin{conjecture}\label{rama} The Cheeger-Simons class is injective.
+That is, volume and Chern-Simons invariant determine elements of
+$H_3(\psl2c;\Z)$ completely. This is a special case of a general
+conjecture of Ramakrishnan in algebraic $K$-theory; see
+\cite{neumann-hilbert} for a discussion. \end{conjecture}
+
+If $k$ is an algebraic number field and
+$\sigma_1,\dots,\sigma_{r_2}\colon k\to\C$ are its different complex
+embeddings up to conjugation then denote by $\vol_j$ the composition
+$$\vol_j=\vol\circ(\sigma_j)_*\colon H_3(\PSL(2,k);\Z)\to\R.$$ The map
+$$\Borel:=(\vol_1,\dots,\vol_{r_2})\colon
+H_3(\PSL(2,k);\Z)\to\R^{r_2}$$ is called the \emph{Borel regulator}.
+\begin{theorem}\label{borel theorem} The Borel regulator maps
+$H_3(\PSL(2,k);\Z)/Torsion$ injectively onto a full sublattice of
+$\R^{r_2}$.
+\end{theorem}
+
+It is known that $\cs$ is injective on the torsion subgroup of
+$H_3(\psl2c;\Z)$. Thus, by Theorems \ref{various results} and
+\ref{borel theorem}, $\cs(M)\in\R/\Z$ and $\Borel([M]_{PSL}) \in
+\R^{r_2(k)}$ determine the PSL-fundamental class $[M]_{PSL}\in
+H_3(\psl2c;\Z)$ completely, where $k$ is the invariant trace field of
+$M$. 
+
+\snap\ computes $$\Borel(M):=\Borel([M]_{PSL}).$$ To describe how, it
+helps to introduce the ``Bloch Group'' $\Bloch(\C)$. In the next
+subsection we give this group a geometric description, but in fact, by
+a result of Bloch and Wigner and others, it is naturally the quotient
+of $H_3(\psl2c;\Z)$ by its torsion subgroup $\Q/\Z$. 
+
+We can now explain how a cusped $3$-manifold has a PSL-fundamental
+class in $H_3(\psl2c;\Z)$ modulo an order $2$ ambiguity. We shall see
+that it has a natural class in the Bloch group, which can be thought
+of as a PSL-fundamental class modulo torsion, and the Meyerhoff
+definition of Chern-Simons invariant then pins down the
+PSL-fundamental class up to the stated ambiguity. It would be nice to
+find a more direct definition that gives a fundamental class in
+$H_3(\PSL(2,K);\Z)$ (modulo a similar ambiguity to the above) when
+$\Gamma\subset\PSL(2,K)$, but the above definition does not do this.
+
+
+\subsection{Bloch group} There are several different definitions of
+the Bloch group in the literature. They differ at most by torsion and
+they agree with each other for algebraically closed fields. We shall
+use the following.
+
+\begin{definition}\label{def-bloch} Let $k$ be a field. The {\em
+pre-Bloch group $\Prebloch(k)$} is the quotient of the free
+$\Z$-module $\Z (k-\{0,1\})$ by all instances of the following
+relations:
+\begin{gather} [x]-[y]+[\frac
+yx]-[\frac{1-x^{-1}}{1-y^{-1}}]+[\frac{1-x}{1-y}]=0, \label{5term}\\
+[x]=[1-\frac 1x]=[\frac 1{1-x}]=-[\frac1x]=-[\frac{x-1}x]=-[1-x].
+\label{invsim}
+\end{gather} The first of these relations is usually called the {\em
+five term relation}. The {\em Bloch group $\Bloch(k)$} is the kernel
+of the map $$
+\Prebloch(k)\to k^*\wedge_\Z k^*,\quad [z]\mapsto 2(z\wedge(1-z)). $$
+\end{definition}
+
+For $k=\C$, the relations (\ref{invsim}) express the fact that
+$\Prebloch(\C)$ may be thought of as being generated by isometry
+classes of ideal hyperbolic 3-simplices. The five term relation
+(\ref{5term}) then expresses the fact that in this group we can
+replace an ideal simplex on four ideal points by the cone of its
+boundary to a fifth ideal point. As is shown an appendix to
+\cite{neumann-yang3}, the effect is that $\Prebloch(\C)$ is a group
+generated by ideal polyhedra with ideal triangular faces modulo the
+relations generated by cutting and pasting along such faces. 
+
+\subsection{The Bloch invariant}\label{Bloch Invariant} 
+
+Suppose we have an ideal triangulation of an hyperbolic $3$-manifold
+$M$ using ideal hyperbolic simplices with cross ratio parameters
+$z_1,\dots,z_n$. This ideal triangulation can be a genuine ideal
+triangulation of a cusped $3$-manifold, or a deformation of such a one
+as used by \snap\ and \snappea\ to study Dehn filled manifolds, but it
+may be of much more general type, see \cite{neumann-yang3}. 
+
+\begin{definition} The {\em Bloch invariant $\beta(M)$} is the element
+$\sum_1^n [z_j]\in\Prebloch(\C)$. If the $z_j$'s all belong to a
+subfield $K\subset \C$, we may consider $\beta(M)$ as an element of
+$\Prebloch(K)$. \end{definition}
+
+It is shown in \cite{neumann-yang3} that 
+\begin{theorem}\label{field restrict} If $\beta(M)$
+can be defined as above in $\Prebloch(K)$ then it actually lies in
+$\Bloch(K)\subset\Prebloch(K)$ and is independent of triangulation.
+\end{theorem}
+
+In these terms, the Borel regulator $\Borel(M)$ can also be thought of
+as an invariant of the Bloch invariant $\beta(M)$ and can be computed
+as follows. The invariant trace field $k$ of $M$ will always be
+contained in the field $K$ generated by the simplex parameters $z_i$,
+$i=1,\dots,n$. The $j$-th component $\vol_j([M]_{PSL})$ of $\Borel(M)$
+is $$\Borel(M)_j=\sum_{i=1}^n D_2(\tau_j(z_i)),$$ where $\tau_j\colon
+K\to\C$ is any complex embedding that extends $\sigma_j\colon k\to
+\C$. Here $D_2$ is the ``Wigner dilogarithm function'' $$D_2(z) =
+\operatorname{Im} \ln_2(z) +
+\log |z|\arg(1-z),\quad z\in \C -\{0,1\},$$ where $\ln_2(z)$ is the
+classical dilogarithm function. $D_2(z)$ is also the volume of the
+ideal simplex with parameter $z$.
+
+As described earlier, \snap\ specifies the invariant trace field $k$
+as a subfield of $\C$ by giving the minimal polynomial of a
+``canonical'' primitive element together with the position of the this
+primitive element in a list of the roots of this polynomial. \snap\
+numbers the roots with non-negative imaginary part using real roots
+first in order of size, say $c_1<c_2<\dots<c_{r_1}$, and then non-real
+roots in lexicographic order of size of real and imaginary parts,
+$c_{r_1+1},\dots,c_{r_1+r_2}$. Finally, roots with negative imaginary
+part have negative indices: $c_{-j}=\overline c_j$. The ``canonical
+element'' is the first complex root in the list $c_{r_1+1},\overline
+c_{r_1+1},c_{r_1+2},\overline c_{r_1+2},\dots$ that generates the
+correct subfield of $\C$.
+
+In printing $\Borel(M)$ \snap\ uses the complex embeddings given by
+the complex roots $c_{r_1+1}, c_{r_1+2}, \dots$ above. The effect is
+that, according as the canonical element is $c_{r_1+j}$ or
+$c_{-(r_1+j)}$, the component $\Borel(M)_j$ of the Borel regulator is
+$\vol(M)$ or $-\vol(M)$. In the latter case --- more generally,
+whenever $k\ne\overline k$ --- the Borel regulator $\Borel(-M)$ is
+simply $-\Borel(M)$. However, if $k=\overline k$ then \snap's printout
+of $\Borel(M)$ and $\Borel(-M)$ refer to the same embedding of $k$
+(both times given by the same canonical element), so the relation is
+given by the action of conjugation on $\Bloch(k)$, which is a bit more
+subtle.
+
+It can be shown that $\pm \vol(M)$ is, in fact, the component with
+largest absolute value in the Borel regulator (see
+\cite{neumann-yang3}).
+
+Some interesting examples with invariant trace field
+$\Q(x)/(x^4+x^2-x+1)$ are discussed in \cite{neumann-yang3}. We list
+all examples with this invariant trace field from the closed and
+cusped censuses in Table 5.\iffalse The Bloch group has rank $2$ since the
+field has two complex embeddings. The first complex embedding occurs
+for $11$ different manifolds in the censuses, giving three different
+Borel regulators, which are, however, proportional to each other. For
+the second embedding there are $13$ manifolds, giving four different
+Borel regulators, only two of which are proportional to each other. \fi
+
+To compare the Bloch invariants of manifolds with different trace
+fields we must compute in the Bloch group of a common field. We close
+this section with interesting examples which illustrate this. 
+
+\def\vol3{\mbox{\it Vol3}}
+\def\weeks{\mbox{\it Weeks}}
+
+\begin{example} The manifold of conjecturally smallest volume is the
+so-called Weeks manifold $\weeks$ which is $\hbox{m003}(-3,1)$ in the
+closed census. Its invariant trace field is: $$[x^3
+- x^2 + 1, -2],$$ by which we mean the subfield of $\C$ generated by
+the complex conjugate of the second root of the polynomial $x^3-x^2+1$
+(the first root is the real root). This field has one complex
+embedding, so the Borel regulator has just one component, which, by
+the above discussion, will be minus the volume:
+$$\Borel(\weeks)=[-0.9427073627769277209212996031]$$ 
+
+The manifold of conjecturally third smallest volume is called
+$\hbox{m007}(3,1)$ in the closed census. It is an arithmetic manifold
+of exactly half the volume of the figure eight knot complement, i.e.,
+its volume is the volume $1.0149416..$ of a regular ideal simplex. Let
+us call this manifold $\vol3$ for short. Its invariant trace field is
+$$[x^2-x+1,1]$$ and its Borel regulator is thus
+$$[1.014941606409653625021202554].$$ However, we can ask \snap\ to
+compute the Borel regulator in the field $k(\weeks)=[x^3 - x^2 + 1,
+-2]$ of the Weeks manifold instead. \snap\ complains that this field
+does not contain our invariant trace field, and then proceeds to
+compute the join of the two fields and gives us the answer in that
+field: $$\displaylines{ [x^6 - x^5 + x^4 - 2x^3 + x^2 + 1, -2]\cr
+[1.014941606409653625021202554, -1.014941606409653625021202554,\cr
+-1.014941606409653625021202554].}$$ From this we see that the joined
+field $K$ is degree $6$, as expected, and that it has three complex
+embeddings and they restrict on $k(\vol3)$ once to the given embedding
+and twice to its conjugate.
+
+Computing with the Weeks manifold in this same field we get a Borel
+regulator: $$[0, -0.9427073627769277209212996031,
+0.9427073627769277209212996031]$$ (which tells us that the first
+complex embedding of our degree 6 field restricts to the real
+embedding of $k(\weeks)$ and the next two complex embedding restricts
+to the complex embedding of $k(\weeks)$ and its conjugate). 
+
+It has been asked if the Bloch group can be generated by Bloch
+invariants of $3$-manifolds (a positive answer would imply the
+``Rigidity Conjecture'', see e.g., \cite{neumann-yang3} and
+\cite{neumann-hilbert}). If so, one might guess that a ``random''
+3-manifold with invariant trace field equal to the above degree 6
+field $K$ is likely to have Borel regulator linearly independent of
+the above two Borel regulators, since the Bloch group has rank $3$.
+There turn out to be just two manifolds in the closed census with this
+invariant trace field (as far as has been computed). They are
+$\hbox{v2274}(-3,2)$ and $-\hbox{v2274}(3,2)$, and they both have the same 
+Borel regulator, namely: $$\displaylines{[2.029883212819307250042405108,
+-4.858005301150090412806303917,\cr 0.7982388755114759127214937007].}$$
+It turns out that this is, at least numerically, equal to
+$$3\Borel(\weeks)+2\Borel(\vol3).$$
+\end{example}
+
+Other interesting examples are given by surgeries on the census
+manifold \hbox{v3066}, as discussed in \cite{neumann-yang3}.  This
+manifold gives some of the most interesting examples of the ``twins''
+phenomenon discussed in Example \ref{twinsex}. The four surgeries
+$\hbox{v3066}(\pm p,q)$ and $\hbox{v3066}(\pm 2q, p/2)$ all have the
+same volume for each $p,q$.
+\begin{example}\label{v3066}\def\K{K_{18}} The manifolds
+$M_1=\hbox{v3066}(6,1)$ and $M_2=\hbox{v3066}(-6,1)$ have invariant
+trace fields
+$$[x^9 - 2x^7 - 5x^6 + 12x^5 + 8x^4 + 15x^3 + 4x^2 + 2x - 1,-2]$$ and
+$$[x^9 - 2x^7 - 5x^6 + 12x^5 + 8x^4 + 15x^3 + 4x^2 + 2x - 1,-5]$$
+respectively. The join of these fields is $$
+\begin{aligned}\K=[x^{18}& - 6x^{16} - 4x^{15} + 8x^{14} + 6x^{13} +
+19x^{12} + 16x^{11}\\& + 32x^{10} - 84x^9 - 104x^8 + 52x^7 + 67x^6 -
+8x^5 + 30x^4 - 28x^3 + 8x^2 - 2x + 1,-1],\end{aligned} $$ with $9$
+complex embeddings, and the Borel regulators of the above two
+manifolds, computed in this join, are respectively:
+$$\begin{aligned}
+\beta_1&=[-2a_1-a_2,-a_1,2a_1+a_2,a_1+a_2,0,-a_2,a_1+a_2,-a_1,a_2]\\
+\beta_2&=[-2a_1-a_2,a_2,a_1,a_1+a_2,-a_1-a_2,a_1,0,-2a_1-a_2,a_2],
+\end{aligned}
+$$ where $$a_1=2.568970600936708884920674169,\quad
+a_2=0.6083226776636170914331534552. $$ The automorphism group of the
+field $\K$ is order $6$. Each of $\beta_1$ and $\beta_2$ is fixed by
+an involution in this automorphism group, since they come from degree
+9 subfields. Nevertheless, we can find three Galois conjugates of each
+of $\beta_1$ and $\beta_2$, so we might hope to generate up to a rank
+6 subgroup of $\Bloch(\K)$. But in fact, we only generate a rank 3
+subgroup.
+\iffalse
+\footnote{This is in keeping with the Ramakrishnan conjecture,
+Conjecture \ref{rama}, which would imply that the first coordinate of
+the Borel regulator should have rank 1 kernel in this case. Indeed, it
+is shown in
+\cite{neumann-yang2} (see also the proof of Theorem \ref{sc} below)
+that the conjecture would imply the kernel of the $i$-th coordinate
+has rank equal to the number of complex embeddings of the real
+subfield of $\sigma_i(\K)$ (the $i$-th complex embedding). This
+subfield is degree 3 with 1 complex embedding in our case.}. \fi
+
+The Galois conjugates of $\beta_1$ are $\beta_1$ and $$\begin{aligned}
+\beta_1'&=[-a_1,a_2,-a_2,0,-a_1-a_2,2a_1+a_2,-a_1-a_2,-2a_1-a_2,-a_2]\\
+\beta_1''&=[a_2,-2a_1-a_2,a_1,-a_1-a_2,a_1+a_2,a_1,0,a_2,-2a_1-a_2]
+\end{aligned}
+$$ and we find that
+$$\beta_2=\frac13(2\beta_1+2\beta_1'-\beta_1'').$$ 
+
+Various 3-manifolds can be found in the census with invariant trace
+fields contained in $\K$. So far they all have Bloch invariant in the
+above rank 3 subgroup of $\Bloch(\K)$. For example the field
+$[x^3+2x-1,2]$ is the fixed field of $\operatorname{Aut}(\K)$. It
+occurs as the invariant trace field of various manifolds, for example
+$\hbox{v3066}(1,2)$, and they all have Borel regulator computed in
+$\K$ proportional to
+$\Borel(\hbox{v3066}(1,2)=\frac23(\beta_1+\beta_1'+\beta_1'')$. The
+field $[x^3 - x^2 + x + 1,i]$ occurs as a subfield of $\K$ for each of
+its three embeddings $i=1,2,-2$. The real embedding ($i=1$) is in fact
+the real subfield of $\K$. The complex embedding and its conjugate
+occur for many census manifolds and leads to Borel regulators in $\K$
+that are integer multiples of $2\beta_1-\beta_1'-\beta_1''$ or its
+Galois conjugate $2\beta_1''-\beta_1-\beta_1'$, depending on
+orientation. The third Galois conjugate $2\beta_1'-\beta_1''-\beta_1$
+must belong to the embedding $[x^3-x^2+x+1,1]$, i.e., to the real
+subfield of $\K$. We will use this fact in the next section. 
+
+In addition to three embeddings of the degree $9$ field already
+mentioned, the only other subfields of $\K$ are $\Q(\sqrt{-11})$ and
+two degree $6$ fields (the joins of $\Q(\sqrt{-11})$ with the degree
+three subfields above; one of these degree $6$ fields is Galois over
+$\Q$). None of these degree $2$ and $6$ fields have been found so far
+in the census. One must, however, be careful about making premature
+guesses from these data: arithmetic manifolds exist for any imaginary
+quadratic field --- for $\Q(\sqrt{-11})$ they have just not been found
+in the census. The Bloch invariant for these arithmetic manifolds will
+lie outside the above rank three subgroup of $\Bloch(\K)$.
+\end{example}
+
+\section{Scissors Congruence}
+
+\def\sc{\operatorname{\mathcal P}}
+\def\dehnker{\operatorname{\mathcal D}}
+
+The \emph{scissors congruence group} $\sc(\H^3)$ is the abelian group
+generated by congruence classes of hyperbolic polyhedra of finite
+volume modulo all relations of the form: $P=P_1+\dots+P_n$ if the
+polyhedra $P_1,\dots,P_n$ can be glued along faces to create the
+polyhedron $P$. Dupont and Sah showed that one obtains the same group
+whether one allows ideal polyhedra or not (\cite{dupont-sah}; for an
+exposition and references for the material of this section see
+\cite{neumann-hilbert}).
+
+The \emph{Dehn invariant} is the map
+$$\delta\colon\sc(\H^3)\to\R\otimes\R/\pi$$ defined on generators of
+$\sc(\H^3)$ as follows. If $P$ is a compact polyhedron then
+$\delta(P)=\sum_El(E)\otimes\theta(E)$ where the sum is over the edges
+$E$ of $P$ and $l(E)$ and $\theta(E)$ are length and dihedral angle.
+For an ideal polyhedron one first truncates the ideal vertices by
+horocycles and then uses the same definition, summing only over edges
+that do not bound one of the horocycle faces of the truncated
+polyhedron. The kernel of the Dehn invariant will be denoted
+$$\dehnker(\H^3):=\ker(\delta\colon\sc(\H^3)\to\R\otimes\R/\pi).$$ 
+
+If one subdivides an hyperbolic 3-manifold $M$ into polyhedra then the
+sum of these polyhedra defines an element $\beta_0(M)$ in the scissors
+congruence group $\sc(\H^3)$ and it is an easy exercise to see that in
+fact $\beta_0(M)$ is in $\dehnker(\H^3)$. 
+
+This group $\dehnker(\H^3)$ is closely related to the Bloch group.
+Since $\Bloch(\C)$ is a $\Q$-vector space, it splits as the direct sum
+$$\Bloch(\C)=\Bloch_+(\C)\oplus\Bloch_-(\C)$$ of its $+1$ and $-1$
+eigenspaces under the action of conjugation. Dupont and Sah
+\cite{dupont-sah} showed:
+\begin{theorem} The Dehn invariant kernel
+$\dehnker(\H^3)$ is naturally isomorphic to $\Bloch_-(\C)$. In fact
+the natural map of the pre-Bloch group $\Prebloch(\C)$ to $\sc(\H^3)$,
+defined by mapping a class $[z]$ to the ideal simplex with parameter
+$z$, induces a surjection $\Bloch(\C)\to\dehnker(\H^3)$ with kernel
+$\Bloch_+(\C)$. The Bloch invariant $\beta(M)$ is taken to the
+scissors congruence class $\beta_0(M)$ by this map. \end{theorem}
+
+In particular, this implies that the scissors congruence class
+$\beta_0(M)$ is orientation-insensitive. In fact, it was first pointed
+out by Gerling in a letter to Gauss that any polyhedron is scissors
+congruent to its mirror image. The paper \cite{neumann-hilbert}
+discusses to what extent one may think of the Bloch group as giving an
+orientation-sensitive version of scissors congruence, and in
+\cite{neumann-yang3} an explicit interpretation in terms of scissors
+congruence allowing only cut-and-paste along ideal triangles is
+described. However, the geometric interpretation of this for
+$\beta(M)$ needs care --- for instance the manifold $\vol3$ discussed
+earlier appears to have no subdivision into ideal tetrahedra at all. 
+
+Note that if two manifolds have the same scissors congruence class,
+say $\beta_0(M_1)=\beta_0(M_2)$, this means {\it a priori} only that
+$M_1$ and $M_2$ are \emph{stably} scissors congruent; that is, there
+is some polyhedron $Q$ such that $M_1+Q$ can be cut-and-pasted to form
+$M_2+Q$. However, one can show that if $M_1$ and $M_2$ are either both
+compact or both non-compact then adding $Q$ is unnecessary: $M_1$ can
+be cut into polyhedra that can be reassembled to form $M_2$. 
+
+\begin{theorem}\label{sc} Suppose $M_1$ and $M_2$ both have invariant
+trace field contained in the field $K$. The following are equivalent: 
+
+1.~~$M_1$ and $M_2$ are stably scissors congruent, that is
+$\beta_0(M_1)=\beta_0(M_2)$.
+
+2.~~$\Borel(M_1)+\Borel(-M_1)=\Borel(M_2)+\Borel(-M_2)$ (this must be
+computed over a field containing $K$ and $\overline K$). 
+
+3.~~$\Borel(M_1)-\Borel(M_2)$ is proportional to some $\Borel(x)$ with
+$x\in\Bloch(K\cap\R)$.
+\end{theorem}
+\begin{proof} The equivalence of the first two conditions follows
+because $\beta(-M)=-\overline\beta(M)$ and the map
+$x\mapsto\frac12(x-\overline x)$ defines the projection
+$\Bloch(\C)\to\Bloch_-(\C)$.
+
+Denote $\Bloch(K)_\Q$ the image of $\Bloch(K)\otimes\Q$ in
+$\Bloch(\C)\otimes\Q=\Bloch(\C)$ (recall $\Bloch(\C)$ is a $\Q$-vector
+space). In \cite{neumann-yang2} it is shown that the
+$\Bloch(K)_\Q\cap\Bloch_+(\C)=\Bloch(K\cap\R)_\Q$. This is thus the
+kernel of the map $\Bloch(K)\to\sc(\H^3)$, proving equivalence of the
+third condition.
+\end{proof}
+
+\begin{example}\def\K{K_{18}} Returning to the manifolds
+$M_1=\hbox{v3066}(6,1)$ and $M_2=\hbox{v3066}(-6,1)$ of Example
+\ref{v3066}, we find that they are scissors congruent. Indeed,
+$\Borel(M_1)-\Borel(M_2)=
+[0,-a_1-a_2,a_1+a_2,0,a_1+a_2,-a_1-a_2,a_1+a_2,-a_1-a_2,0]=
+\frac13(2\beta_1'-\beta_1''-\beta_1)$, and we pointed out in Example
+\ref{v3066} that this Borel regulator comes from the real subfield of
+$\K$. \end{example}
+
+The following conjecture has been made by many people. It is, as
+discussed in \cite{neumann-hilbert}, also a consequence of Conjecture
+\ref{rama} and hence of the Ramakrishnan conjecture.
+\begin{conjecture} The map $\mbox{{\rm vol}}\colon\dehnker(\H^3)\to\R$ is
+injective. \end{conjecture}
+
+\snap\ provides many examples like the above which 
+give evidence for this conjecture.
+
+\section{Some tables}\label{tables}
+
+The tables in this section list some arithmetic and numerical invariants
+of hyperbolic 3-manifolds computed using Snap. Much more extensive tables of
+results are available from http://www.ms.unimelb.edu.au/\~{}snap.
+
+Under the heading ``Invariant trace field'' we list:
+the canonical minimal polynomial $p$ defining the field,
+the signature $[r_1,r_2]$, and the canonical root
+number (as described in footnote \ref{rootnumbers}).
+
+Under the heading ``Quaternion algebra'' we list the
+finite ramification (giving generators for the corresponding
+prime ideals), then real ramification of the
+invariant quaternion algebra (giving the root number for the
+corresponding real field embeddings). 
+The last column Int/Ar indicates whether all
+traces are integral and whether manifold is arithmetic
+(1 = yes, 0 = no).
+Manifolds are named using the notation of SnapPea;
+$*$ is used to denote the mirror image of a manifold.
+
+
+Table~\ref{lowvolclosed} lists invariants for the first 12 closed hyperbolic
+3-manifolds in the Hodgson-Weeks census \cite{Ho-We}. These are conjectured 
+to be the 12 hyperbolic 3-manifolds of smallest volume.
+
+
+Table~\ref{algebras} includes examples of closed manifolds
+chosen to illustrate various phenomena including
+
+\noindent$\bullet$~~~~manifolds with the same invariant trace field
+but different invariant quaterion algebras,
+
+\noindent$\bullet$~~~~closed manifolds with the full matrix
+algebra as invariant quaternion algebra (i.e. no ramification),
+
+\noindent$\bullet$~~~~ arithmetic and non-arithmetic manifolds with the
+same invariant quaterion algebra,
+
+\noindent$\bullet$~~~~ manifolds with the same abstract invariant trace field, 
+but different complex embeddings,
+
+\noindent$\bullet$~~~~manifolds with the same invariant quaternion algebra,
+but not commensurable (distingushed by integrality of traces).
+
+
+For cusped manifolds, the invariant quaternion algebra is always the
+full matrix algebra over the invariant trace field. 
+For non-arithmetic cusped manifolds with one cusp, we list
+another useful commensurability invariant: the density of a
+maximal embedded horoball cusp (see \cite{nr2}).  
+A similar invariant can be
+defined for multicusped cusped non-arithmetic manifolds, provided
+that there is a finite sheeted covering where all cusps are equivalent 
+under the symmetry group. In this case, we compute the cusp density by taking
+equal volume horoballs at all the cusps.
+
+Table~\ref{cusped_ex} includes examples of cusped manifolds chosen
+to ilustrate various phenomena including:
+
+\noindent$\bullet$~~~~ arithmetic and non-arithmetic manifolds with the
+same invariant quaterion algebra,
+
+\noindent$\bullet$~~~~ non-arithmetic manifolds with the same 
+invariant quaternion algebra but different cusp densities,
+
+\noindent$\bullet$~~~~ manifolds with the same abstract invariant trace field, 
+but different complex embeddings.
+
+This table includes some familiar knots complements: 
+$\hbox{m004}, \hbox{m015}, \hbox{m016}, \hbox{m032}$ are the 
+complements of knots $4_1$, $5_2$, the $-2,3,7$-pretzel, and knot $6_1$
+respectively. A table of arithmetic invariants computed using Snap 
+for the complements of knots with up to 8 crossings is given in 
+\cite{call-reid}.
+
+
+Table~\ref{bloch_exs} lists Borel regulators and arithmetic 
+invariants for all the closed and cusped census manifolds for which
+the invariant trace field has been computed to be $x^4+x^2-x+1$.
+Some of these examples are discussed in \cite{neumann-yang3}. Note that
+the first two Borel regulators are proportional for the field with root 2,
+while all three Borel regulators are proportional for the field with root 1.
+The table also includes examples of the following phenomena:
+
+\noindent$\bullet$~~~~manifolds with same Borel regulator 
+but different invariant quaternion algebras,
+
+\noindent$\bullet$~~~~closed and cusped manifolds with the same
+Borel regulator,
+
+\noindent$\bullet$~~~~ manifolds $\hbox{v2050}(4,1)$ and 
+$\hbox{v3404}(1,3)$ with the
+same arithmetic invariants (invariant trace field, 
+invariant quaternion algebra, non-integral traces) but not commensurable
+as their Borel regulators are not proportional.
+
+\begin{sidewaystable}
+\centering
+\begin{tabular}{|>{\PreserveBackslash\raggedright}p{4.2cm}| %
+>{\PreserveBackslash\raggedright}p{4.2cm}|
+	>{\PreserveBackslash\raggedright}p{6cm}|
+	>{\PreserveBackslash\raggedright}p{2.4cm}|l|}
+
+\hline
+
+\hbox{Manifold} Volume & \hbox{Eta invariant} Chern-Simons (mod 1)
+& Invariant trace field & \hbox{Quaternion} algebra & Int/Ar\ \\
+
+\hline 
+
+m003(-3,1)
+0.94270736277692772092 &
+0.04002871111915143667 
+0.06004306667872715501 &
+\hbox{$x^3 - x^2 + 1$} [1, 1] (-2) &
+\hbox{$(5, x-2)$} [1]&
+$1/1$ \\
+
+\hline 
+
+m003(-2,3)
+0.98136882889223208809 &
+0.71802545350918014836 
+0.07703818026377022254 &
+\hbox{$x^4 - x - 1$} [2, 1] (3) &
+[1,2] &
+$1/1$ \\
+
+% 1.0149416064096536        Z/3 + Z/6  0.0000000000000000  0.831442945529  m007( 3, 1)
+
+\hline 
+
+m007(3,1)
+1.01494160640965362502 &
+0.00000000000000000000
+-0.50000000000000000000 &
+\hbox{$x^2 - x + 1$} [0, 1] (1) &
+\hbox{$(2) (3, x+1)$} [~]&
+$1/1$ \\
+
+% 1.2637092386580437        Z/5 + Z/5 -0.1141406559693699  0.575078580850  m003(-4, 3)
+
+
+\hline 
+
+m003(-4,3)
+1.26370923865804365588 &
+0.92390622935375341671 
+0.38585934403063012507 &
+\hbox{$x^4 - x^3 + x^2 + x - 1$} [2, 1] (-3) &
+[1,2] &
+$1/1$ \\
+
+
+
+% 1.2844853004683544              Z/6  0.0679316734798631  0.480311803385  m004( 6, 1)
+
+\hline 
+
+m004(6,1)
+1.28448530046835444246 &
+1.04528778231990871951 
+0.06793167347986307927 &
+\hbox{$x^3 + 2x - 1$} [1, 1] (2) &
+\hbox{$(2, x^2 + x + 1)$} [1]&
+$1/1$ \\
+
+
+% 1.3985088841508066          trivial -0.2466072526507687  0.366130702346  m004( 1, 2)
+
+\hline 
+
+m004(1,2)
+1.39850888415080664050 &
+-0.83107150176717910541 
+-0.24660725265076865812 &
+\hbox{$x^7 - 2x^6 - 3x^5 + 3x^4 + 5x^3 - x^2 - 3x + 1$} [5, 1] (6) &
+[2, 3, 4, 5] &
+$1/0$ \\
+
+
+
+\hline 
+
+% 1.4140610441653916              Z/6  0.0766020666485759  0.794134662992  m009( 4, 1)
+m009(4,1)
+1.41406104416539158138 &
+0.38440137776571728943 
+0.07660206664857593414 &
+\hbox{$x^3 - x^2 + 1$} [1, 1] (2) &
+\hbox{$(5, x-2)$} [1]&
+$1/1$ \\
+
+
+\hline 
+
+% 1.4140610441653916             Z/10  0.1182687333152426  0.364894686526  m003(-3, 4)
+m003(-3,4)
+1.41406104416539158138 &
+0.41217915554349506721 
+0.11826873331524260081 &
+\hbox{$x^3 - x^2 + 1$} [1, 1] (2) &
+\hbox{$(19, x-3)$} [1]&
+$1/1$ \\
+
+
+
+\hline 
+
+% 1.4236119002928252             Z/35  0.1125651520461811  0.352371598411  m003(-4, 1)
+m003(-4,1)
+1.42361190029282524980 &
+-0.25828989863587927861 
+-0.38743484795381891791 &
+\hbox{$x^5 - x^3 - x^2 + x + 1$} [1, 2] (2) &
+\hbox{$(13, x+5)$} [1]&
+$1/0$ \\
+
+
+
+\hline 
+
+% 1.4406990067273649              Z/3 -0.2400607094618030  0.361521576120  m004( 3, 2)
+m004(3,2)
+1.44069900672736487528 &
+-0.49337380630786866586 
+0.25993929053819700120 &
+\hbox{$x^6 - x^5 - 2x^4 - 3x^3 + 3x^2 + 3x - 2$} [4, 1] (5) &
+\hbox{$(2,x)$} [1, 3, 4] &
+$1/0$ \\
+
+
+
+\hline 
+
+% 1.4637766449272388              Z/7  0.0606168663471378  0.356645033638  m004( 7, 1)
+m004(7,1)
+1.46377664492723877337 &
+1.37374457756475854543 
+0.06061686634713781814 &
+\hbox{$x^6 - x^5 + x^4 + 2x^3 - 4x^2 + 3x - 1$} [2, 2] (3) &
+[1, 2] &
+$1/0$ \\
+
+
+\hline 
+
+% 1.5294773294300263              Z/5 -0.2346223683614192  0.335975531076  m004( 5, 2)
+m004(5,2)
+1.52947732943002626282 &
+-0.15641491224094610942 
+-0.23462236836141916413 &
+\hbox{$x^7 - x^6 - 2x^5 + 5x^4 - 6x^2 + x + 1$} [5, 1] (6) &
+[2, 3, 4, 5] &
+$1/0$ \\
+
+\hline 
+
+\end{tabular}
+\caption{Arithmetic invariants for the first 12 manifolds
+from the Hodgson-Weeks closed census}
+\label{lowvolclosed}
+\end{sidewaystable}
+
+\begin{table}[p] 
+\centering
+\begin{tabular}{|>{\PreserveBackslash\raggedright}p{3.5cm}
+	|>{\PreserveBackslash\raggedright}p{3.5cm}|l %
+	|>{\PreserveBackslash\raggedright}p{5cm}|}
+
+\hline
+
+Invariant trace field & Quaternion algebra &  Int/Ar\ & Manifolds \\
+
+\hline
+
+\hbox{$x^2 + 1$} [0, 1] (1) &
+\hbox{$(2, x + 1) (3)$} [~]&
+$1/1$ &
+{m304(5,1) m336(-1,3) s942(-2,1) s960(-1,2)} \\
+
+\cline{2-4}
+
+& % $x^2 + 1$ [0, 1] (1) &
+\hbox{$(2, x + 1) (5, x - 2)$} [~]&
+$1/1$ &
+{m293(4,1) s297(-1,3) s572(1,2) s645(-1,2) s682(-3,1) s775(-1,2) s778(-3,1) v3213(-1,3) v3216(4,1)} \\
+
+\cline{2-4}
+
+& % $x^2 + 1$ [0, 1] (1) &
+\hbox{$(2, x + 1) (5, x + 2)$} [~]&
+$1/1$ &
+{m006(1,3) m009(-5,1) m009(5,1) m010(-2,3) m294(4,1) m312(-1,3) s296(5,1) s350(-4,1) s495(1,2) s595(3,1) s775(-3,1) s779(2,1) v3217(-1,3) v3412(5,1)} \\
+
+\cline{2-4}
+
+& % $x^2 + 1$ [0, 1] (1) &
+[~] &
+$0/0$ &
+{m239(-2,3) s254(-3,2)} \\
+
+\hline
+
+\hbox{$x^2 - x + 2$} [0, 1] (1) &
+\hbox{$(2, x) (7, x + 3)$} [~]&
+$1/1$ &
+{m140(-4,1) v3110(3,1) v3147(-3,1)} \\
+
+\cline{3-4}
+
+& % $x^2 - x + 2$ [0, 1] (1) &
+& % $[~] (2, x) (7, x + 3)$ &
+$0/0$ &
+{v3377(-3,1) v3378(-3,1) v3390(3,1)} \\
+
+\hline
+
+\hbox{$x^3 + 2x - 1$} [1, 1] (2) &
+\hbox{$(2, x^2 + x + 1)$} [1]&
+$1/1$ &
+{m004(6,1) m160(1,2) m306(-5,1) m307(-1,3) s554(3,1) s594(-3,2)* v2642(5,1) v2643(-2,3)} \\
+
+\cline{2-4}
+
+& % $x^3 + 2x - 1$ [1, 1] (2) &
+\hbox{$(2, x + 3) (2, x^2 + x + 1)$} [~]&
+$1/0$ &
+{m136(1,2) v2920(-1,2)* v3066(1,2) v3528(3,1)} \\
+
+\hline
+
+\hbox{$x^3 + x - 1$} [1, 1] (2) &
+[~] &
+$1/0$ &
+{s772(-5,2) s772(3,2)* s775(-5,2) s775(3,2)* s778(-5,2) s778(3,2)* s779(-5,2) s779(3,2)* s787(-5,2) s787(3,2)*} \\
+
+\hline
+
+\hbox{$x^3 - x - 2$} [1, 1] (2) &
+\hbox{$(2, x + 1)$} [1]&
+$0/0$ &
+{m293(-2,3)* m390(3,1)*} \\
+
+\cline{3-4}
+
+& % $x^3 - x - 2$ [1, 1] (2) &
+& % $[1] (2, x + 1)$ &
+$1/1$ &
+{m307(-5,1)* m369(-1,3) m371(1,3)* s298(5,1) s594(1,2)* s594(2,1)} \\
+
+\cline{2-4}
+
+& % $x^3 - x - 2$ [1, 1] (2) &
+\hbox{$(2, x + 1) (2, x)$} [~]&
+$1/0$ &
+{s235(-4,3) s595(1,2)} \\
+
+\hline
+
+\hbox{$x^4 - 2x^3 - x^2 + 2x + 2$} [0, 2] (2) &
+\hbox{$(13, x + 2) (13, x - 3)$} [~]&
+$0/0$ &
+{v3207(5,1) v3209(4,3) v3210(5,1) v3208(4,3)} \\
+
+\hline
+
+\hbox{$x^4 + x^2 - x + 1$} [0, 2] (2) &
+[~] &
+$1/0$ &
+{s594(-3,4)* s594(-4,3) } \\ 
+
+\cline{3-4}
+
+& % $x^4 + x^2 - x + 1$ [0, 2] (1) &
+& % $[~]$ &
+$0/0$ &
+{v2050(4,1)* v3404(1,3)} \\
+
+\hline
+
+\hbox{$x^4 + x^2 - x + 1$} [0, 2] (1) &
+[~] &
+$1/0$ &
+{m010(-1,3) m368(4,1) m369(3,1)* m370(-4,1)* s313(-2,3)* s554(1,3)} \\
+
+\hline
+
+\hbox{$x^5 - x - 1$} [1, 2] (2) &
+\hbox{$(2, x^3 + x^2 + 1)$} [1]&
+$1/0$ &
+{v3221(1,2) v3228(-1,2)*} \\
+
+\hline
+
+\hbox{$x^5 - x - 1$} [1, 2] (3) &
+\hbox{$(2, x^3 + x^2 + 1)$} [1]&
+$1/0$ &
+{v3100(1,3)} \\
+
+\hline
+
+\end{tabular}
+%\end{center}
+\caption{Arithmetic invariants of some selected manifolds from the Hodgson-Weeks
+closed census.}
+\label{algebras}
+\end{table}
+
+\begin{table}[p] 
+%\begin{center}
+\centering  
+\begin{tabular}{|>{\PreserveBackslash\raggedright}p{3.5cm} |l %
+	|l %>{\PreserveBackslash\raggedright}p{3.5cm}
+	|>{\PreserveBackslash\raggedright}p{5cm}|}
+
+\hline
+
+Invariant trace field &  Int/Ar\ & Cusp Density & Manifolds \\
+
+\hline
+
+\hbox{$x^2 + 1$} [0, 1] (1) &
+$1/1$ &
+~~&
+{m001 m124 m125 m126 m127 m128 m129 m130 m131 m132 m133 m134 m135 m136 m139 m140 
+	s859 v1858 v1859} \\
+
+\cline{2-4}
+
+& % $x^2 + 1$ [0, 1] (1) &
+$0/0$ &
+ 0.614106035 &
+ {m137 m138} \\
+
+\hline
+
+%Field: x^2 - x + 1 (1)   (37 manifolds)
+
+\hbox{$x^2 - x + 1$} [0, 1] (1) &
+$1/1$ &
+~~&
+{m000 m002 m003 m004 m025 m202 m203 m204 m205 m206 m207 m208 m405 m406  
+m407 m408 m409 m410 m411  m412 m413 m414  s118 s119 s594 s595 s596
+ s955 s956 s957 s958 s959 s960  v2873 v2874 v3551} \\
+
+\cline{2-4}
+
+& % $x^2 - x + 1$} [0, 1] (1) &
+$0/0$ &
+ 0.568850725 &
+{v2875} \\
+
+\hline
+
+%Field: x^2 - x + 2 (1)    (22 manifolds)
+
+\hbox{$x^2 - x + 2$} [0, 1] (1) &
+$1/1$ &
+~~&
+{m009 m010 s772 s773  s774 s775 s776 s777 s778 s779 s780 s781 s782 s784
+ s786 s787} \\
+
+\cline{2-4}
+
+& % $x^2 - x + 2$} [0, 1] (1) &
+$0/0$ &
+ N/A~(inequivalent cusps)&   %symmetries don't interchange the cusps
+{s785} \\
+
+\cline{2-4}
+
+& % $x^2 - x + 2$} [0, 1] (1) &
+$0/0$ &
+ 0.558071819&
+{s783} \\
+
+\cline{2-4}
+
+& % $x^2 - x + 2$} [0, 1] (1) &
+$0/0$ &
+ 0.620079799 &
+{s788 s789 v1539 v1540} \\
+
+\hline
+
+%Field: x^3 - x^2 + 1 (2)    (17 manifolds)
+
+
+\hbox{$x^3 - x^2 + 1$} [1, 1] (2) &
+$1/0$ &
+0.511270966&
+{s898 v2202* v2203} \\ %s898 has two equivalent cusps
+
+\cline{2-4}
+
+& %\hbox{$x^3 - x^2 + 1$} [1, 1] (2) &
+$1/0$ &
+0.524808681&
+{v3428*} \\
+
+\cline{2-4}
+
+& %\hbox{$x^3 - x^2 + 1$} [1, 1] (2) &
+$1/0$ &
+0.539001522 &  %v3429 has two equivalent cusps 0.5390015228575017
+{ v3429*} \\
+
+\cline{2-4}
+
+
+& %\hbox{$x^3 - x^2 + 1$} [1, 1] (2) &
+$1/0$ &
+0.545958189&
+{v0769} \\
+
+\cline{2-4}
+
+& %\hbox{$x^3 - x^2 + 1$} [1, 1] (2) &
+$1/0$ &
+0.575271908&
+{s420*} \\
+
+\cline{2-4}
+
+& %\hbox{$x^3 - x^2 + 1$} [1, 1] (2) &
+$1/0$ &
+0.604035858&
+{v3426 v3427} \\ %v3426 has two equivalent cusps
+
+\cline{2-4}
+
+& %\hbox{$x^3 - x^2 + 1$} [1, 1] (2) &
+$1/0$ &
+0.612276793&
+{v2204* v2205*} \\
+
+\cline{2-4}
+
+& %\hbox{$x^3 - x^2 + 1$} [1, 1] (2) &
+$1/0$ &
+0.697799972&
+{m015* m017* s899 s900} \\
+
+\cline{2-4}
+
+& %\hbox{$x^3 - x^2 + 1$} [1, 1] (2) &
+$1/0$ &
+0.711685428&
+{m016* s897} \\
+
+\hline
+
+
+%Field: x^3 - x^2 + x + 1 (2)   (30 manifolds)
+
+\hbox{$x^3 - x^2 + x + 1$} [1, 1] (2) &
+$1/0$ &
+N/A~(inequivalent cusps)&
+{v3220 v3223* } \\
+
+\cline{2-4}
+& %\hbox{$x^3 - x^2 + x + 1$} [1, 1] (2) &
+$0/0$ &
+N/A~(inequivalent cusps)&
+{v3224*} \\
+
+\cline{2-4}
+
+& %\hbox{$x^3 - x^2 + x + 1$} [1, 1] (2) &
+$1/0$ &
+0.616691512&
+{m035 m037 m039* m040* v3218 v3222*  v3225* v3227*} \\
+%v3218, v3222, v3225 have 2 equiv cusps
+%v3227 has a 2-fold cover with symm gp = Z2 x D4 and 4 equiv cusps
+
+\cline{2-4}
+
+& %\hbox{$x^3 - x^2 + x + 1$} [1, 1] (2) &
+$1/0$ &
+0.623017665&
+{m376*} \\
+
+\cline{2-4}
+
+& %\hbox{$x^3 - x^2 + x + 1$} [1, 1] (2) &
+$1/0$ &
+0.645539037&
+{m036* m038 v3214 v3215* v3216 v3217*} \\
+
+\cline{2-4}
+
+& %\hbox{$x^3 - x^2 + x + 1$} [1, 1] (2) &
+$0/0$ &
+0.646337229 &
+{v3226} \\
+
+\cline{2-4}
+
+& %\hbox{$x^3 - x^2 + x + 1$} [1, 1] (2) &
+$0/0$ &
+0.652161114 &
+{s448} \\
+
+\cline{2-4}
+
+& %\hbox{$x^3 - x^2 + x + 1$} [1, 1] (2) &
+$1/0$ &
+0.675735988 &
+{v3207 v3208 v3209 v3210} \\
+
+\cline{2-4}
+
+& %\hbox{$x^3 - x^2 + x + 1$} [1, 1] (2) &
+$1/0$ &
+0.717278605 &
+{v3219 v3221 v3228*} \\
+
+\cline{2-4}
+
+& %\hbox{$x^3 - x^2 + x + 1$} [1, 1] (2) &
+$1/0$ &
+0.726163222 & %v3211  has 2 equiv cusps
+{v3211 v3212 v3213*} \\
+
+\hline
+
+
+%%(two different embeddings of same field)
+
+\hbox{$x^4 + x^2 - x + 1$} [0, 2] (1) &
+$1/0$ &
+ 0.614493011&
+{m161*} \\
+
+\cline{2-4}
+
+& %\hbox{$x^4 + x^2 - x + 1$} [0, 2] (1) &
+$1/0$ &
+ 0.631076941&
+{s919*} \\
+
+\cline{2-4}
+
+& %\hbox{$x^4 + x^2 - x + 1$} [0, 2] (1) &
+$1/0$ &
+ 0.662737952&
+{m159* m160} \\
+
+\hline
+
+\hbox{$x^4 + x^2 - x + 1$} [0, 2] (2) &
+$1/0$ &
+ 0.595110801&
+{s235} \\
+
+\cline{2-4}
+
+& %\hbox{$x^4 + x^2 - x + 1$} [0, 2] (2) &
+$1/0$ &
+ 0.630681177&
+{m032* m033*} \\
+
+\cline{2-4}
+
+& %\hbox{$x^4 + x^2 - x + 1$} [0, 2] (2) &
+$1/0$ &
+ 0.686680170&
+{s435* s436*} \\
+
+\hline
+
+\end{tabular}
+%\end{center}
+\caption{Arithmetic invariants of some selected manifolds from the 
+Hildebrand-Weeks cusped census.}
+\label{cusped_ex}
+\end{table}
+
+
+
+
+
+
+%\begin{figure}[p] 
+\begin{sidewaystable}
+\centering
+\begin{tabular}{|>{\PreserveBackslash\raggedright}p{3.2cm}
+|>{\PreserveBackslash\raggedright}p{4.2cm}
+|>{\PreserveBackslash\raggedright}p{3.4cm}|l
+|>{\PreserveBackslash\raggedright}p{2.0cm}
+|>{\PreserveBackslash\raggedright}p{4.2cm}|}
+
+\hline
+
+Invariant trace field & Borel Regulator & Quaternion algebra &  Int/Ar\
+& Manifolds &Chern-Simons (mod $\frac{1}{2}$) \\
+
+\hline
+
+\hbox{$x^4 + x^2 - x + 1 $} (2) &
+-1.41510489726556334068 
+3.16396322888314398399 &
+$(2, x+3)$ ~$(13, x+6)$  [~]&
+$1/0$ &
+{m140(5,2)* }& 
+0.17735631658981817209 \\
+
+\cline{3-6}
+ &
+ &
+$(2, x+3)$ ~$(2, x^3+x^2+1)$ [~]&
+$1/0$ &
+{m136(5,2)* }&
+0.21902298325648483876 \\
+
+\cline{3-6}
+ &
+ &
+$(2, x+3)$ ~$(233, x+72)$ [~]&
+$1/0$ &
+{m140(-5,2) } &
+-0.23931035007684849456 \\
+
+\cline{3-6}
+ &
+ &
+[~]&
+$1/0$ &
+{m032*} &
+-0.15597701674351516123 \\
+
+\cline{5-6}
+ &
+ &
+&%[~]&
+&%$1/0$ &
+{m033*} &
+0.09402298325648483876 \\
+
+\cline{2-6}
+ &
+-2.12265734589834501103 
+4.74594484332471597598 &
+[~]&
+$1/0$ &
+{s435*} &
+0.05770114155139392481 \\
+\cline{5-6}
+ &
+&%-2.122657345898345011034262881 4.745944843324715975986522074 &
+&%[~]&
+&%$1/0$ &
+{s436*} &
+-0.19229885844860607518\\
+
+
+
+\cline{2-6}
+& %\hbox{$x^4 + x^2 - x + 1 $} (2) &
+-0.21181355280835614147 
+4.39667280193249561612 &
+$(2, x+3)$ ~$(19, x-5)$ [~]&
+$1/0$ &
+{s855(3,2)} &
+-0.24238579181095171467 \\
+
+\cline{3-6}
+& %\hbox{$x^4 + x^2 - x + 1 $} (2) &
+&%-0.2118135528083561414788017694 4.396672801932495616121158767 &
+ [~]&
+$1/0$ &
+{s594(-3,4)* } &
+0.00761420818904828532 \\
+\cline{5-6}
+& %\hbox{$x^4 + x^2 - x + 1 $} (2) &
+&%-0.2118135528083561414788017694 4.396672801932495616121158767 &
+&% [~]&
+&%$1/0$ &
+{s594(-4,3) } &
+-0.24238579181095171467 \\
+
+\cline{5-6}
+& %\hbox{$x^4 + x^2 - x + 1 $} (2) &
+&%-0.2118135528083561414788017694 4.396672801932495616121158767 &
+&% [~]&
+&%$1/0$ &
+{s235 } &
+0.13261420818904828532 \\
+
+\cline{4-6}
+& %\hbox{$x^4 + x^2 - x + 1 $} (2) &
+&%-0.2118135528083561414788017694 4.396672801932495616121158767 &
+&% [~]&
+$0/0$ &
+{v2050(4,1)* } &
+-0.20071912514428504800  \\
+
+\cline{2-6}
+& %\hbox{$x^4 + x^2 - x + 1 $} (2) &
+0.99147779164885105773
+5.62938237498184724825  &
+[~]&
+$0/0$ &
+{v3404(1,3)} &
+-0.16212790021172160144  \\
+
+\hline
+\hbox{$x^4 + x^2 - x + 1 $} (1) &
+1.91084379308998886955  
+-0.34927204139222035986 &
+ [~]&
+$1/0$ &
+{m010(-1,3)}& 
+-0.09574639997098769384\\
+
+\cline{2-6}
+&%\hbox{$x^4 + x^2 - x + 1 $} (1) &
+3.82168758617997773911  
+-0.69854408278444071973 &
+$(2,x+3) (29, x-14)$ [~] &
+$1/0$ &
+{m294(4,3)*}& 
+-0.02482613327530872102\\
+
+\cline{5-6}
+
+&%\hbox{$x^4 + x^2 - x + 1 $} (1) &
+&%3.821687586179977739110922224  -0.6985440827844407197307266120 &
+&%(2,3+x) (29, -14+x) [~] &
+&%$1/0$ &
+{m293(-4,1)}& 
+0.22517386672469127897 \\
+
+\cline{3-6}
+&%\hbox{$x^4 + x^2 - x + 1 $} (1) &
+&%3.821687586179977739110922224  -0.6985440827844407197307266120 &
+ [~] &
+$1/0$ &
+{m369(3,1)* m370(-4,1)* m368(4,1) s554(1,3)}& 
+0.14184053339135794563\\
+
+\cline{5-6}
+&%\hbox{$x^4 + x^2 - x + 1 $} (1) &
+&%3.821687586179977739110922224  -0.6985440827844407197307266120 &
+&% [~] &
+&%$1/0$ &
+{m160 m161*}& 
+-0.19149279994197538769 \\
+
+\cline{5-6}
+&%\hbox{$x^4 + x^2 - x + 1 $} (1) &
+&%3.821687586179977739110922224  -0.6985440827844407197307266120 &
+&% [~] &
+&%$1/0$ &
+{m159*}& 
+0.05850720005802461230 \\
+
+\cline{2-6}
+&%\hbox{$x^4 + x^2 - x + 1 $} (1) &
+5.73253137926996660866 
+-1.04781612417666107959 &
+ [~] &
+$1/0$ &
+{s919*}& 
+-0.16223919991296308154 \\
+
+\hline
+
+\end{tabular}
+\caption{Bloch invariants of some closed and cusped manifolds with invariant trace field
+$x^4 + x^2 - x + 1 $.}
+\label{bloch_exs}
+\end{sidewaystable}
+
+\vfill
+\eject
+
+\begin{thebibliography}{99}
+
+\bibitem{atiyah-patodi-singer2} 
+M.~Atiyah, V.~Patodi and I.~Singer,
+\newblock  Spectral asymmetry and Riemannian geometry 2,
+\newblock Math. Proc. Cambridge Philos. Soc. {\bf78} (1975), 402--433. 
+
+\bibitem{BPZ}
+S.~Betley, J.H.~Przytycki and T.~Zukowski,
+\newblock Hyperbolic structures on Dehn fillings of some 
+punctured-torus bundles over $S^1$,
+\newblock {Kobe J. Math.} {\bf 3} (1986), 117--147.
+
+\bibitem{call-reid}
+P.J.~Callahan and A.W.~Reid, 
+\newblock Hyperbolic structures on knot complements,
+\newblock Chaos, Solitons and Fractals, {\bf9} (1998), 705--738.
+
+\bibitem{cheeger-simons} 
+J.~Cheeger and J.~Simons, 
+\newblock Differential characters and geometric invariants,
+\newblock  Springer Lect. Notes in Math. {\bf1167} (1985), 50--80.
+
+\bibitem{chern-simons}
+S.~Chern, J.~Simons, 
+\newblock {Some cohomology classes in principal fiber
+bundles and their application to Riemannian geometry},
+\newblock  Proc. Nat. Acad. Sci. U.S.A. {\bf68} (1971), 791--794.
+
+\bibitem{pari}
+H.~Cohen C.~Batut, D.~Bernardi and M.~Olivier,
+\newblock {PARI-GP version 2},
+\newblock {\tt ftp: megrez.math.u-bordeaux.fr}.
+
+
+\bibitem{cohen}
+H.~Cohen,
+\newblock {\em A course in computational algebraic number theory},
+\newblock Graduate Texts in Mathematics {\bf 138}, Springer-Verlag, 1993.
+
+\bibitem{dupont-kamber} 
+J.L.~Dupont and F.L.~Kamber,
+\newblock Cheeger-Chern-Simons classes of transversally symmetric foliations:
+dependance relations and eta-invariants,
+\newblock  Math. Ann. {\bf295} (1993), 449--468.
+
+\bibitem{dupont-sah}
+J.L.~Dupont, H.~Sah,  Scissors congruences II, J.\ Pure and App.\
+Algebra {\bf25} (1982), 159--195.
+
+\bibitem{ep}
+D.~B.~A.~Epstein and R.~C.~Penner,
+\newblock Euclidean decompositions of hyperbolic manifolds,
+\newblock { J. Diff. Geom.} {\bf27} (1988), 67--80.
+
+\bibitem{gmmr}
+ F.~W.~Gehring, C.~Maclachlan, G.~J.~Martin and A.~W.~Reid,
+\newblock Arithmeticity, discreteness and volume,
+\newblock Trans. Amer. Math. Soc. {\bf349} (1997), 3611--3643.
+
+\bibitem{HiW} M.~Hildebrand and J.~Weeks,  A computer generated census of
+cusped hyperbolic 3-manifolds, in: Computers and Mathematics, eds.
+E.~Kaltofen and S.~Watt, Springer-Verlag (1989) 53-59.
+
+\bibitem{hlm}
+ H.M.~Hilden, M.T.~Lozano and J.M.~Montesinos-Amilibia,
+\newblock {A characterization of arithmetic subgroups of $\mbox{SL}(2,{\mathbb
+  R})$ and $\mbox{SL}(2,{\mathbb C})$},
+\newblock { Math. Nachr.} {\bf159} (1992) 245--270.
+
+\bibitem{Ho-We}
+C.D.~Hodgson and J.~Weeks, A census of closed hyperbolic 3-manifolds,
+in preparation. 
+
+\bibitem{kirby}
+R.~Kirby,
+\newblock {Problems in low-dimensional topology},
+\newblock {AMS/IP Studies in Advanced Mathematics},
+\newblock {Volume 2, part 2,}
+\newblock Amer. Math. Soc., 1997.
+
+\bibitem{lang}
+S.~Lang,
+\newblock {\em Algebraic number theory},
+\newblock Graduate Texts in Mathematics {\bf 110}, Springer-Verlag, 1986.
+
+\bibitem{macbeath}
+A.M.~Macbeath,
+\newblock Commensurability of co-compact three-dimensional hyperbolic groups,
+\newblock {Duke Math. J.} {\bf 50} (1983) 1245--1253.
+
+\bibitem{magnus}
+W.~Magnus,
+\newblock {Rings of Fricke characters and automorphism groups of free groups},
+\newblock { Math. Zeitschrift} {\bf 170} (1980), 91--103.
+
+\bibitem{meyerhoff}
+R.~Meyerhoff, 
+\newblock  Hyperbolic 3-manifolds with equal volumes but
+different Chern-Simons invariants,
+\newblock in {\it Low-dimensional topology and
+Kleinian groups}, edited by D.~B.~A.~Epstein, London Math.\ Soc.\
+lecture notes series, {\bf112} (1986) 209--215.
+
+\bibitem{meyerhoff-neumann} 
+R.~Meyerhoff and W.~Neumann, 
+\newblock An asymptotic formula for the $\eta$-invariant 
+of hyperbolic 3-manifolds,
+\newblock  Comment. Math. Helvetici {\bf67} (1992), 28--46.
+
+\bibitem{meyerhoff-ouyang}
+R.~Meyerhoff and M.~Ouyang, 
+\newblock The $\eta$-invariants of cusped hyperbolic $3$-manifolds, 
+\newblock Canad. Math. Bull. {\bf 40} (1997), 204--213.
+
+\bibitem{milnor-stasheff} 
+J.~W.~Milnor and J.~D.~Stasheff,
+\newblock  {\em Characteristic classes}, 
+\newblock Annals of Math. Studies {\bf76}, Princeton
+University Press, 1974.
+
+\bibitem{mostow}
+G.~D.~Mostow,
+\newblock {\em Strong rigidity of locally symmetric spaces}, 
+\newblock Annals of Math. Studies {\bf78}, Princeton
+University Press, 1973.
+
+\bibitem{neumann1}
+W.~D.~Neumann,
+\newblock Homotopy invariance of Atiyah invariants,
+\newblock  Proc. Symposia
+in Pure Math., Volume 32, part 2, Amer. Math. Soc., 1978, 181--188.  
+
+
+\bibitem{neumann2}
+W.~D.~Neumann,  
+\newblock Combinatorics of triangulations and the Chern
+Simons invariant for hyperbolic 3-manifolds,
+\newblock  in {\it Topology 90,
+Proceedings of the Research Semester in Low Dimensional Topology at
+Ohio State}, Walter de Gruyter Verlag, Berlin - New York 1992,
+243--272.
+
+\bibitem{neumann-hilbert} 
+W.~D.~Neumann,
+\newblock Hilbert's 3rd problem and 3-manifolds,
+\newblock Geometry and Topology Monographs Volume 1: The Epstein Birthday
+Schrift, Igor Rivin, Colin Rourke and Caroline Series (editors)
+(International Press, 1998 and electronically at
+www.maths.warwick.ac.uk/gt), 383--411.
+
+\bibitem{neumann-in-progress}
+W.~D.~Neumann,
+\newblock {The extended Bloch group and the Chern-Simons invariant},
+\newblock in preparation.
+
+\bibitem{nr1}
+W.~D.~Neumann and A.~W.~Reid,
+\newblock {Arithmetic of hyperbolic manifolds},
+\newblock In {\em Topology 90, Proceedings of the Research Semester in Low
+  Dimensional Topology at Ohio State},  Walter de Gruyter Verlag,
+  Berlin - New York, 1992, 273--310.
+
+\bibitem{nr2}
+W.~D.~Neumann and A.~W.~Reid,
+\newblock {Notes on Adams' small volume orbifolds}
+\newblock In {\em Topology 90, Proceedings of the Research Semester in Low
+  Dimensional Topology at Ohio State},  Walter de Gruyter Verlag,
+  Berlin - New York, 1992, 311--314.
+
+\bibitem{neumann-yang1} W.~D.~Neumann and J.~Yang,
+\newblock  Problems for
+$K$-theory and Chern-Simons invariants of hyperbolic 3-manifolds,
+\newblock L'Enseignement Math\-\'em\-at\-ique {\bf41} (1995), 281--296.
+
+\bibitem{neumann-yang2}
+W.~D.~Neumann and J.~Yang,
+\newblock  Invariants from triangulation for
+hyperbolic 3-manifolds,
+\newblock  Electronic Research Announcements of the
+Amer. Math. Soc. {\bf1} (2) (1995), 72--79.
+
+\bibitem{neumann-yang3}
+W.~D.~Neumann and J.~Yang,
+\newblock  Bloch invariants of hyperbolic 3-manifolds,
+\newblock Duke Math. J. (to appear).
+
+\bibitem{nz}
+W.~D.~Neumann, D.~Zagier,  Volumes of hyperbolic 3-manifolds,
+Topology {\bf24} (1985), 307--332.
+
+\bibitem{ouyang}
+M.~Ouyang, 
+\newblock A simplicial formula for the $\eta$-invariant 
+of hyperbolic $3$-manifolds, 
+\newblock Topology {\bf36} (1997), 411--421.
+
+\bibitem{pohst}
+Michael~E.~Pohst,
+\newblock {\em Computational algebraic number theory}, { DMV
+  Seminar} {\bf 21}, 
+\newblock Birkh{\"{a}}user, 1993.
+
+\bibitem{reidphd}
+Alan~W.~Reid,
+\newblock{Arithmetic Kleinian groups and their Fuchsian subgroups},
+\newblock{ Ph.D. thesis}, Aberdeen, 1987.
+
+\bibitem{reid}
+Alan~W.~Reid,
+\newblock A note on trace-fields of {Kleinian} groups,
+\newblock { Bull. London Math. Soc.} {\bf 22} (1990), 349--352.
+
+\bibitem{tak}
+K.~Takeuchi,
+\newblock {A characterization of arithmetic Fuchsian groups},
+\newblock {J. Math. Soc. Japan} {\bf 27} (1975), 600--612.
+
+\bibitem{thurston}
+W.P.~Thurston,
+\newblock {\em The geometry and topology of 3-manifolds},
+\newblock Princeton University, 1977,
+\newblock Mimeographed lecture notes.
+
+\bibitem{vigneras}
+M-F.~Vign\'{e}ras,
+\newblock {\em Arithm\'{e}tique des alg\`{e}bres de quaternions},
+\newblock Lecture Notes in Math. Springer-Verlag {\bf 800}, 1980.
+
+\bibitem{snappea}
+Jeffrey~R.~Weeks,
+\newblock {SnapPea}, the computer program,
+\newblock {\tt http://www.geom.umn.edu/software/\-down\-load/snappea.html}.
+
+\bibitem{yoshida} 
+T.~Yoshida,
+\newblock {The $\eta$-invariant of hyperbolic 3-manifolds},
+\newblock Invent. Math. {\bf81} (1985), 473--514.
+
+\end{thebibliography}
+
+\end{document}
+
+
+

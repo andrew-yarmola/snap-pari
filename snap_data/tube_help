@@ -1,0 +1,725 @@
+Help file for tube. Each word in a command may be abbreviated to its
+shortest unique prefix.
+
+. help <tube-command>
+
+Prints a short description of the command. Help messages are extracted
+from the file "tube_help". Command words may be abbreviated to their
+shortest unique prefixes. For a list of all commands type "menu".
+
+. manifold <number>
+
+Sets the current manifold to which any further command is supplied and
+updates the prompt accordingly. Tube can store up to 10 manifolds
+numbered 1-10. Most commands implicitly operate on the current
+manifold. A few also take a manifold number to indicate a second
+manifold as input, or a place to store output. 
+
+. menu
+
+Lists all available commands. 
+
+. list 
+
+Lists all the manifolds currently in tube's memory. Use "manifold n"
+to change the current manifold. 
+
+. read census <census> <number>
+. read file <filename>
+
+Either read a census manifold or a manifold file. Eg. "r c 5 4" reads
+m004, manifold number four in the census of cusped manifolds having up
+to five tetrahedra. The search path used for the compressed (terse)
+census files (trs5, trs6, trs7), and for manifold files is printed by
+the command "print settings".
+
+. quit
+
+Terminates the program. ^D also terminates it.
+
+. save menu [<filename>]
+
+Saves a copy of tube's full menu of commands, by default in the file
+"tube_menu" if no file name is supplied. 
+
+. save manifold [<filename>]
+
+Saves a SnapPea format file of the manifold. The default filename is 
+the root name if the manifold is complete, and the root name
+followed by surgery coefficients if any cusp has been filled. Eg.
+m004(5,1) is saved (by default) in m004_5_1.
+
+. save dirichlet [<g1> .. <gn>]
+
+Saves a 3-D picture of a Dirichlet domain for the manifold in Geomview
+format, in the file "dirichlet.gv". If geodesics have been computed
+(via the "print geodesics" command) then geodesic numbers may be
+specified after the command. In that case images of the geodesics are
+included in the saved picture. 
+
+. save ortholines <g-num> <n-radii>
+
+Saves a 3-D picture of a Dirichlet domain and includes a picture of
+the specified geodesic g-num in red, and ortholines of that geodesic
+in green. Ortholine segments are grouped by real
+orthodistance. n-radii says how many groups of equal real
+orthodistance ortholines to include. !!Currently the function seems to
+hang for any but the most trivial examples.!! 
+
+. save trace
+
+Diagnostic for tube computations. Saves a picture of the successive
+results of clipping a face of the tube. The face to trace has to be
+set in advance of the tube computation via the "set trace"
+command. The output is saved in postscript format in the file
+"tube.ps". 
+
+. set trace <tube-face-num>
+
+Diagnostic for tube computations. Asks the tube program to keep track
+of what happens at a particular face during tube computation. To
+switch tracing off again do "set trace -1". To see the results of
+tracing a face, do "save trace" after "compute tube ..". 
+
+. save picture
+
+Puts a picture of the tube domain, as seen in the universal cover of a
+torus linking the core geodesic, in the file "tube.ps". The
+x-direction (horizontal) is distance along the core geodesic. The
+y-direction is angle around it.  What is actually printed depends on
+the print_options string which is set by the command "set picture".
+
+. set picture <option_string>
+
+Determines what is saved in the file ./tube.ps when the command "save
+picture" is given. Options should be a single word. It is read as a
+concatenation of shorter subwords, each preceeded by a "-": 
+eg. "-fbp-b" which is the default setting of print_options. 
+
+A subword which starts "-f" indicates that the faces of the tube
+domain (ie. portions of certain equidistant surfaces) should be
+displayed.  Following a "-f" the next letter should be either "b" or
+"t". A "b" indicates that faces should be shown for just one copy of
+the torus fundamental domain, the base copy. A "t" indicates that the
+faces should be shown tiling the plane (universal cover of the torus).
+Following the "b" or "t" there should be a "p" or an "o". A "p"
+indicates that faces should be shown as a filled colored polygons.
+Faces of the same color are paired. An "o" indicates that the faces
+are to be drawn in outline.
+
+There may be more than one subword starting "-f". Eg. "-fbp-fto"
+draws one fundamental domain's worth of faces, filled, in color, and
+tiles a portion of the plane around that with outlines of translates of
+the faces. 
+
+A subword of "-o" indicates that the ortholines responsible for each
+face should be shown (as dots).
+
+A subword of "-b" indicates that a box should be drawn equal to a
+fundamental region for the torus. 
+
+A subword of "-B" indicates that a large box should be drawn going
+from -4 to 4 in the x-direction, and -pi to pi, in the y-direction. 
+
+.
+
+The next two options apply to cusp tubes only. 
+
+A subword of "-t" indicates that the triangles arising from the ideal
+tetrahedra should be shown. Triangles are shown gluing together to
+form one fundamental domain for the cusp (or more precisely, the link
+of a core geodesic).
+
+A subword of "-r" indicates that the vertices of triangles used as
+representitives for vertices of the corresponding triangulation of the
+torus should be shown. This is mainly for debugging purposes. 
+
+. save face_picture
+
+!!Currently not working.!!
+For each face of the tube domain, "tube" prints the face in outline
+and the image of the paired face as a colored polygon. If there is any
+mismatch between the two faces this should show up. Sometimes the mesh
+used to compute the regions is not fine enough for us to really decide
+if two faces are matching. In that case the "set mesh" command can be
+used to get a finer subdivision. 
+
+. save natural_picture
+
+Saves the faces of the tube shown in their "natural" coordinates. Each
+face is part of an equidistant surface between two geodesics, and as
+such has rulings in two directions. These are mapped onto the x and y
+directions in save natural_picture.
+
+. save curve_picture
+
+!!Currently not working.!! 
+Was intended to show a picture of how a meridian or longitude curve
+passes through the faces of a tube domain. 
+
+. save geomview_picture
+
+!!Currently not working.!!
+Saves a 3-dimensional picture of the tube in geomview format in the
+file "tube.gv". What is actually saved is controlled by the geomview
+picture options (see "print settings" and "set gv_options"). 
+
+. set gv_options <option_string>
+
+!!This controls the operation of save geomview_picture which is
+currently not working.!!
+
+A subword of "-f[bt][pwo]" indicates which faces to save and how on a
+picture of the tube. A "b" says just show enough faces for one
+fundamental domain of the tube torus; a "t" says tile along the
+geodesic to show a reasonable portion of the tube. A "p" says show
+surfaces filled in (polyhedral); a "w" says show them wireframe; an
+"o" says to show only the boundaries (outline). (All combinations
+except "-fbo" are recognized.)
+
+A subword of "-Pbo" indicates that we also want to see other lifts of
+the tube. The lifts are shown with faces in outline tiled, along the
+tube. One lift is shown pairing with each face in a fundamental
+domain for the tube torus.  
+
+. surgery <m1> <l1> ... <mc> <lc>
+
+where c is the number of cusps of the current manifold, does Dehn
+surgery on the cusps. Use 0 0 for any cusps which should remain
+unfilled (complete). 
+
+. clear surgery
+
+Returns the manifold to the complete (unfilled) structure. 
+
+. canonize
+
+Replaces the triangulation of the current manifold with the canonical
+triangulation. This simply calls the SnapPea canonize function. 
+
+. randomize
+
+Replaces the triangulation of the current manifold with a ranomized
+equivalent triangulation. This simply calls the SnapPea randomize function. 
+
+. simplify
+
+Attempts to simplify the triangulation of the current manifold. This
+just calls the SnapPea simplify function. 
+
+. reorient
+
+Reverses the orientation of the manifold. 
+
+. identify
+
+Attempts to locate the current manifold (which should have unfilled
+cusps) in the cusped census.
+
+. set dirichlet epsilon <new_value>
+
+The dirichlet epsilon is a value used to decide whether two points are
+close enough to be considered equal in SnapPea's Dirichlet domain
+computation. When there are problems computing a Dirichlet domain it
+may help to try different values for this.
+
+. set tube epsilon <new_value>
+
+When tube face pairings are checked, vertices no more than this
+distance apart are considered to match. Distances are computed in the
+natural coordinate system on the equidistant surfaces given by the
+ruling lines and running between -1 and 1 in each coordinate for a
+whole equidistant surface. 
+
+. set face epsilon <new_value>
+
+The faces of a tube consist of a collection of intervals, which are
+real quartic curves in the plane. These intervals should normally
+arrange themselves into loops. This epsilon controls when the
+endpoints of intervals are considered to match.  If the polynomials
+defining the intervals are badly conditioned it may be necessary to
+reduce the face epsilon slightly to obtain complete loops. (If the
+mismatch is significant it probably indicates a bug in the program
+rather than run of the mill roundoff error.)
+
+If there is a failure at any point in a tube computation of the
+intervals to form loops, the program terminates printing out a list of
+"clipping matrices" for the offending face. Each matrix is a 3x3 real
+matrix M_i encoding the polynomial f_i(x,y) = (1,y,y^2) M_i (1,x,x^2)^t. 
+The loops being computed are the boundary curves of the plane subset 
+{(x,y) | f_i(x,y) >= 0 for all i}. 
+
+. set stop count <number>
+
+!!Currently this is ignored.!!
+Sets the maximum number of real orthodistances used before giving up
+on a tube computation. Ortholines are listed in order of real
+orthodistance. 
+
+. set stop radius <r>
+
+!!Currently this is ignored.!!
+Sets a maximum on the real orthodistance of ortholines to consider
+when computing a tube. 
+
+. print settings
+
+Prints all current settings of the tube program. Each setting can be
+modified by the appropriate "set" command. 
+
+. print shapes
+
+Prints the complex shape parameters of tetrahedra in the ideal
+triangulation. 
+
+. print volume 
+
+Prints the volume of the current manifold as computed by SnapPea,
+along with an estimated precision for that volume. 
+
+. print symmetry orbits <max_length>
+
+Computes the symmetries of the current manifold and prints geodesics
+grouped together into orbits under the action of the symmetry
+group. For each orbit we print the complex length of a geodesic,
+enough of its ortholength spectrum to distinguish it from geodesics of
+the same length in other orbits, and a list of all the geodesics in
+that orbit. The list is sorted by length and ortholengths. I am making
+the unproven assumption that geodesics in different orbits are
+distinguished by their ortholength spectra.
+
+Warning: if a geodesic is very short it may be time consuming to
+compute its ortholength spectrum.
+
+. print core length
+
+Prints the lengths of the core geodesics of the manifold. !!This
+function doesn't seem to work properly for multi-cusped manifolds. The
+"find_core" function gives correct information and more of it.!! 
+
+. print core ortholines
+
+For a 1-cusped manifold prints the set of ortholines which will be
+used to compute a core tube. Initially this corresponds to the set of
+edges of the ideal triangulation. See "print ortholines" for a
+description of the format in which ortholines are printed. The
+geodesic number is arbitrarily set to -2. To find out which geodesic
+the core geodesic actually is, use the "find_core" function.
+
+. print k <cutoff> <g1> [.. <gn>]
+
+Corresponding to any ortholine is an equidistant surface: pick a lift
+of the ortholine and the geodesic(s) at its ends into H^3. Then
+between the two lifted geodesic there is an equidistant surface which
+bisects the ortholine. Suitably normalized in the Klein model this
+surface has the equation z = kxy. The constant k indicates how twisted
+the surface is with k=0 corresponding to a totally geodesic
+plane. 
+
+This function prints the k values for each ortholine printed out by
+the function "print ortholines"
+
+. print core k
+
+Prints the k values (see "print k") for the ortholines of the core
+geodesic: see "print core ortholines". 
+
+. compute tube <geodesic_number>
+
+Attempts to compute a tube around the given geodesic. The function
+returns when a tube has been computed, a fatal error has occurred,
+more than a minute has elapsed, no more ortholines are available from
+the current tiling, or there is an unmatched vertex which cannot be
+removed by any ortholine available from the current tiling. 
+
+If successful it prints a count of the number of faces the tube
+has. Two kinds of fatal error are possible. The first is
+a loss of integrity of the tube faces: the problem and a possible cure
+for it are described in the help for the function "set face
+epsilon". The second definitive failure is if the tube ever contains
+an unmatched vertex which cannot be removed by any future ortholine.
+
+If the tube is incomplete but no fatal error has occurred the user may
+proceed in either of two ways. If the computation was stopped because
+it ran for more than a minute, one can simply continue from the
+point where it left off by repeating the "compute tube" command. If it
+runs out of ortholines or at least out of ortholines which can remove
+any currently unmatched vertices the user can increase the tiling
+radius before repeating the "compute tube" command. (In the latter
+case, if the tiling radius is not increased "compute tube" should
+return almost immediately.) See "tile" and "print tile radius". 
+
+. compute core tube
+
+Assumes the manifold has just one cusp and that this is currently Dehn
+filled. Real as well as integer Dehn fillings are allowable.
+Initially, edges of the ideal triangulation give orthodistances from
+the core geodesic to itself. These are used to compute a tube around
+the core geodesic. "print core ortholines" prints the list of
+ortholines which would be used for any such tube computation. The list
+of ortholines may be modified using "add core word" and "delete core
+word". This in principle should allow the user to deform a tube
+through changes in combinatorics. 
+
+. add core word <word>
+. delete core word <word>
+
+Allows us to add to or delete words from the list of ortholines
+used in core tube computation and printed by "print core ortholines". 
+
+. add faces
+
+Has the same effect as calling "compute tube n" where n is the same as
+for the previous call of "compute tube". !!Originally this function
+was supposed to just do one more ortholine. It might be useful to
+reinstate the former functionality at some point.!! 
+
+. clear tube
+
+Clears the current tube.
+
+. print solution_type
+
+Prints the solution type of the current manifold. This is also printed
+out after Dehn surgery. It is one of the following: "not attempted",
+"geometric", "nongeometric", "flat", "degenerate", "other", "no solution".
+
+. tile <radius>
+
+Computes a Dirichlet domain for the manifold if this has not already
+been done and tiles hyperbolic space to the given radius. What this
+means is that every tile whose base point lies within radius of the
+base point of the starting tile is included. 
+
+. print tile radius
+
+Prints the current tiling radius as set, either explicitly by a call
+of "tile", or implicitly by "print geodesics", "print ortholines" or
+any of a few other functions which need to compute geodesics or
+ortholines. 
+
+. print geodesics <cutoff>
+
+Prints all geodesics up to real length cutoff. The complex length
+and a word in the unsimplified fundamental group are printed for each
+geodesic.
+
+. print length_spectrum <cutoff> 
+
+Prints complex lengths up to real length cutoff. Following each length
+is a list of the geodesics which realize this length. Geodesics with
+conjugate lengths are listed together; if the length of a geodesic is
+the conjugate of the listed length, its number is followed by an
+asterisk. 
+
+. print injectivity_radii <max_length>
+
+Prints all geodesics up to real length max_length along with the
+injectivity radius (half the real orthodistance to the nearest
+non-identical lift) of each one. 
+
+Warning: if the list includes a very short geodesic it will most
+likely have a large injectivity radius. In order to find this the
+program will have to tile to that radius and this can take a long
+time. !!Should have some way to bypass short geodesics.!!
+
+. print tetrahedra
+
+Prints the tetrahedra positioned so as to form a fundamental domain
+for the manifold. Tetrahedron 0 should have vertices at 0, 1 and
+infinity.
+
+Each face is also labelled: the i'th label corresponds to the face
+opposite the i'th vertex. A label is 0 if the face coincides with a
+face of another tetrahedron in the fundamental domain. Otherwise it is
+the letter denoting the face pairing in the unsimplified fundamental
+group.
+
+. print holonomies
+
+Prints the (logarithmic) holonomies of the meridian and longitude for
+each cusp. If the holonomies printed out are [u,v] and the current
+surgery is m, l then m*u + l*v == 2*pi*i should hold. 
+
+. print ortholines <cutoff> <g1> [.. <gn>]
+
+Prints all ortholines between closed geodesics g1..gn up to a real
+orthodistance of cutoff. An ortholine is a geodesic segment running
+perpendicularly, either from a closed geodesic to itself, or from one
+closed geodesic to another.
+
+The function fixes a coordinate system for the link of each specified
+geodesic such that distance along a geodesic and angle around it are
+the real and imaginary parts respectively of a single complex
+number. Each ortholine is then specified by giving the complex
+distance between the geodesics at its ends, follwed by two pairs,
+integer:complex. The integer specifies which geodesic the ortholine
+ends at and the complex number gives the position and direction in
+which the ortholine leaves that geodesic.
+
+. curve <m> <l>
+
+Prints information about the m,l curve on a maximal radius tube around
+the core geodesic. This assumes the manifold is 1-cusped. The function
+does not attempt to compute the tube. 
+
+. print faces
+
+Prints the faces of the current tube. Each face is numbered and face
+2n pairs with face 2n+1. Each face is given as a list of
+intervals. The intervals form the boundary of the face and should link
+up to form loops. If the face has more than one connected component
+there will be more than one loop. Separate loops are printed with a
+blank line between them. The endpoints of the intervals are vertices
+of the tube and are given in the following coordinates.  [complex,
+real]: relative to the core geodesic of the tube, the complex
+coordinate specifies distance along the geodesic and angle around it
+in real and imaginary parts respectively. (This part of the coordinate
+system is the same as that used by the "print ortholines" function.)
+The real coordinate is simply the hyperbolic distance of the point
+from the core geodesic. Due to the limitations of machine precision
+arithmetic, points which are supposed to lie on the sphere at infinity
+can have a distance as low as around 6. (If the distance exceeds 20 it
+is printed as Infinity.)
+
+Along with each interval is printed the number of the adjacent face,
+then one of 0, +/-M, +/-L +/-M+/-L. Each interval is created when the
+face is cut off by the equidistant surface containing a neighboring
+face.  The tube computation is done (at least partially) in the
+universal cover of the link of the core geodesic. Therefore, as well
+as cutting off by surfaces arising from the ortholines themselves, we
+also cut off by meridian and longitude translates of those (ortholines
+and) surfaces.
+
+. print natural
+
+Prints the faces of the current tube. Prints the same information as
+"print faces", with the sole exception that endpoints of intervals are
+given in a different coordinate system. 
+
+Each face of a tube is part of an equidistant surface between two
+geodesics. Such surfaces are ruled by two sets of geodesics and these
+give a natural coordinate system for the surface in which both
+coordinates lie in the range (-1,1). In fact the surface can always be
+normalized to be a surface of the form z = kxy in the Klein model of
+H^3, and it is the x and y of this normalization which form the
+natural coordinate system of the surface. This function prints the
+endpoints of intervals as complex numbers whose real and imaginary
+parts are the natural coordinates of those points.
+
+. print connected_faces
+
+Prints the faces of the current tube (see "print faces"). Sometimes
+several faces of a tube may be part of the same equidistant surface. When
+this happens, the "print faces" command prints those faces as a single
+face with several connected components. This function separates out
+such faces and renumbers all the faces so that they run contiguously
+from 0. The numbering is again arranged such that faces 2n and 2n+1 are
+paired. The faces are no longer printed as lists of intervals but
+rather as lists of vertices running cyclically around the face. Each
+vertex is given in the same coordinate system as that used by "print
+faces". 
+
+Edges are labelled with the adjacent face and which universal cover
+translate of that face caused the edge to be generated (see "print
+faces"). In fact for each vertex we print the labels on both the
+incoming and the outgoing edges. 
+
+Separating the connected components of the faces of a tube is a
+necessary prelude to drilling out the core geodesic of the tube.
+
+. print corners
+
+Given a tube domain this gives a summary of the whole combinatorial
+setup. Each connected face of the tube (see "print
+connected_faces") is assigned an integer, and vertices are numbered
+cyclically around the face. First, for each face and partner pair, the
+vertex correspondence is given. Following that is an entry for each
+vertex of the tube domain: at each vertex several face corners come
+together. We list corners cyclically around the vertex, giving each one
+by a (face,vertex) pair. Ideal vertices are indicated by putting a '*'
+after each corner. Generically, 3 corners meet around each
+finite. Around ideal vertices, 6 is more likely. 
+
+The information returned by "print corners" is all that is needed in
+order to compute the cell complex given by "print drilling_info" and
+that in turn is sufficient to compute the drilled manifold ("drill
+tube"). 
+
+. print drilling_data
+
+Given a tube domain in an n-cusped manifold, more or less dual to that
+tube is an ideal cell decomposition of an n+1-cusped manifold which is
+topologically the original manifold minus the core geodesic of the
+tube. Whereas the "drill tube" function subdivides the cell
+decomposition into an ideal triangulation for the new manifold, this
+function simply prints out the cell decomposition. 
+
+To compute the cell decomposition, tube does the combinatorial
+equivalent of first truncating each ideal vertex of the tube and
+constructing another tube around each cusp. This gives a collection of
+solid tori (minus a core geodesic in every case but one) whose
+boundaries form a cell complex in the original manifold. The dual
+complex has an ideal vertex for each core geodesic, an infinite edge
+for each face, a 2-cell for each edge of the previous complex, and a
+cell for each vertex. 
+
+For each cell, faces and vertices are numbered contiguously from
+zero. For each cell we give each face as a face number followed by a
+list of vertices (in the order they appear around a face). We also
+give the face to which it glues as cell:face[vertices]. For example,
+(in cell 2 say), 1[0,2,3] -> 0:7[1,2,4] means that face 1 has vertices
+0, 2 and 3 and that these glue to vertices 1, 2 and 4 respectively of
+face 7 of cell 0.
+
+. drill tube <n>
+
+Computes the manifold obtained by drilling out the core geodesic of
+the current tube, and saves it as manifold n. This function first
+computes a cell complex (see "print drilling_info"), then subdivides
+each cell into ideal tetrahedra to obtain an ideal triangulation for
+the drilled manifold. The first cusp of the drilled manifold is the
+one created by drilling. The Dehn filling coefficients required to
+recover the original manifold are also printed out. 
+
+This function assumes that the cells all have only triangular
+faces. This is equivalent to assuming that each edge of the tube
+domain boudary (viewed as a 2-complex in the original manifold) has 3
+adjacent faces. Generically this is the case. Generically it is also
+the case that each vertex has six adjacent faces, and this corresponds
+to each cell being a tetrahedron. Exceptions to this are sufficiently
+common that we need to take account of them.
+
+Occasionally you will see the following error message:
+ There were too many vertices on a face (more than 15). 
+This seems always to be due to a failure of the program to recognize
+which vertices of the tube are ideal and which are not. This is a
+result of roundoff error whereby ideal vertices appear to lie at a
+distance of less than 10 from the core geodesic of a tube. The
+solution is to "print faces", check for vertices which look like they
+ought to be ideal but have distance less than 10 from the tube
+(distances as low as 6 are possible), and lower the "Ideal vertex
+cutoff" value using "set ideal_vertex_cutoff". 
+
+. set ideal_vertex_cutoff <new_cutoff>
+
+Vertices of a tube domain are by default considered to be ideal if
+their distance from the core geodesic exceeds 10. Unfortunately this
+quantity is very suceptible to roundoff error and can easily drop
+below 10. This affects the output of the "print corners" function and
+causes "print drilling_info" and "drill tube" to fail. The tube around
+geodesic 2 in m004(,) is an example where we need to reduce the ideal
+vertex cutoff to about 8 to avoid problems. 
+
+. tube info
+
+Prints the geodesic number of the current tube, the holonomies (which
+are two complex numbers spanning the same lattice as {complex-length,
+2*pi*i}), and the set of ortholines which gave rise to faces of the
+tube. 
+
+. print group
+
+Prints presentations of the fundamental group of the manifold, both
+simplified and unsimplified. The generators of the unsimplified
+fundamental group come from face pairings of a fundamental domain
+consisting of ideal tetrahedra: see "print tetrahedra". 
+
+. evaluate unsimplified <word/g-num>
+
+Word should be a word in the generators of the unsimplified
+fundamental group or a geodesic number. Inverses of generators are
+given by capital letters. Call "print group" for an unsimplified
+presentation of the fundamental group.
+
+Evaluate prints an SL(2,C) matrix for the element of the fundamental
+group given by the word. It also prints a complex length 
+( = exponential of an eigenvalue) and fixed points. If the
+transformation is loxodromic it then attempts to identify the axis in
+the current list of geodesics. If successful it prints the geodesic
+number, a conjugating element (. for the identity) and what power of
+the element giving the listed geodesic this word is conjugate to. 
+
+. find_core <cusp_num>
+
+Given a Dehn filling description of a manifold it is not always
+obvious which geodesics in the listing given by "print geodesics"
+correspond to the core geodesics of the filled cusps. This function
+determines the axis of a suitable holonomy transformation at the named
+cusp and works out which geodesic, if any, this is. It also prints the
+complex length of the specified core geodesic. 
+
+. unclipped
+
+!!Obsolete. For debugging purposes there was a function to add the
+next equidistant surface to a tube without clipping anything.!!
+
+. check face_pairings
+
+Checks to see if the current tube is complete, ie. if all the faces
+match up. Each face is a collection of intervals in an equidistant
+surface. Since the rulings of paired faces must always match it is
+only necessary to check if intervals match in the coordinates in which
+they are given. Actually the way in which coordinates are chosen means
+that the face pairing becomes (x,y) -> (-x,y). (This will be clear if
+you look at the output of "save natural_picture".) 
+
+If a pair of faces does not match a list of unmatched intervals is
+printed. Intervals can be parametrized either by the x or the y
+coordinate: if the interval is vertical or nearly so, the y coordinate
+is used, otherwise the default is the x coordinate. To make a plane
+curve into a collection of intervals parametrized over x, the curve
+must be subdivided at each point where it becomes vertical. Eg. the
+unit circle must be broken into two intervals by subdividing at (-1,0)
+and at (1,0). Since roundoff error can occasionally influence whether
+intervals are parametrized horizontally or vertically, the subdivision
+of intervals can sometimes differ between matching faces. Therefore,
+before comparing the sets of intervals of two faces, a common
+subdivision is found. 
+
+When faces do not match we are left with some unmatched vertices. If
+clipping by further equidistant surfaces is ever to give a tube 
+domain, there must be surfaces which remove these vertices. How these
+vertices help govern tube computation is discussed in "compute tube". 
+
+. compute old tube
+
+!!Was supposed to compute a tube using the last computed list of
+ortholines. This function has been removed but accidentally left on
+the menu.!!
+
+. 
+
+About analytic continuation
+---------------------------
+
+Since ortholines are computed by taking logs of points in C-{0} there
+is an ambiguity about which branch should be chosen. When the angle,
+subtended at the core geodesic by all the translates in one
+fundamental domain for the linking torus, is small, all ortholines can
+readily be chosen on a "single" branch. 
+
+If we then perform further Dehn surgeries, moving towards points where
+the angle is larger, we should try to avoid jumping onto a different
+branch when we compute the ortholines. "tube" attempts to do this by
+checking after each surgery whether the ortholines moved by more than
+0.5. If they did, it undoes the previous surgery in SnapPea, which
+hopefully returns us to the earlier set of tetrahedral parameters etc.
+(ie. not on some other branch or otherwise corrupt). It then does
+"half" the previous Dehn surgery (eg. going from 4.0 0.5 to 3.7 0.5
+instead of directly to 3.4 0.5). If this is OK it then does the other
+half. If not it goes back to where it failed and halves the step size
+again. After halving the step size 4 times it gives up. It also gives
+up if any backtracking surgery does not get us back to where we were.
+If it has to give up, for either reason, it will print the solution
+type as "not_attempted".
+
+When "tube" first computes ortholines it simply puts all their
+imaginary parts in the range +/- pi. Thereafter it changes them by
+analytic continuation, as described above, each time surgery is
+performed. It is therefore best to make "tube" compute the ortholines
+before going too far from the complete structure, eg. via the "print
+ortholines" command. Unfortunately "tube" can't (currently) compute
+the ortholines for the complete structure; therefore it is necessary
+to begin with some reasonable sized Dehn filling.
+

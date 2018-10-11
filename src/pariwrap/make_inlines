@@ -1,0 +1,96 @@
+#!/usr/bin/perl
+
+# Via the line: make_inlines pari/paridecl.h > inlines.hh
+# this program converts the declarations in gendecl.h into 
+# C++ inline wrapper functions. The ones which have argument
+# lists it can't handle, or which don't have any GEN's in 
+# them anyway, it puts into the file unused_decls. 
+
+# names keeps all the names written into inlines.hh so far
+
+$names = {};
+
+open(NOTUSED, "> unused_decls") || die; 
+
+LINE:
+while (<>) {
+    next LINE unless (/;$/);	# Ignore lines which aren't declarations. 
+    $theline = $_; 
+    ($ret, $name, $args) = /(\w+)\s+(\w+)\((.*)\);/;
+
+    $arggens = 0;
+    $retisgen = $ret=~/GEN/;
+    if ($retisgen) { $ret = 'pari'; }
+
+    @newargs = ();
+    @argname = ();
+
+    @args = split(/,/, $args);
+    foreach $i (0 .. $#args) {
+	($argtype, $argname) = $args[$i]=~/^\s*(.*)\b(\w+)\s*$/;
+
+	# If it didn't parse then ignore it. 
+	if (!$argtype || !$argname) {
+	    print NOTUSED $theline;
+	    next LINE;
+	}
+
+        # strip leading and trailing spaces of argtype
+
+	$argtype=~ s/^\s*//g;
+	$argtype=~ s/\s*$//g;
+
+	if ($argtype eq 'void') { last; }
+
+	$argname[$i] = $argname; 
+
+	# If the final argument is long prec, make it optional, with a 
+	# default value of prec. 
+	if ($argtype eq 'long' && $argname eq 'prec' && $i == $#args) {
+	    $argname[$i] = 'prc';
+	    $argname = 'prc = prec';
+	}
+
+	# Turn all char*'s into const char*'s. 
+	if ($argtype eq 'char*') {
+	    $argtype = 'const char*';
+	    $argname[$i] = '(char*)' . $argname;
+	}
+
+	if ($argtype=~/GEN/) {	# Change GEN's into pari's. 
+	    if ($argtype ne 'GEN') { # Weed out any GEN*'s and the like. 
+		print NOTUSED $theline;
+		next LINE;
+	    }
+	    $argtype = 'pari::tmp'; 
+	    $argname[$i] .= '.g';
+	    $arggens = 1; 
+	}
+	$newargs[$i] = "$argtype $argname";
+    }
+
+    if ($ret eq 'void') {
+	$callname = $name;
+    } else {
+	$callname = "return $name";
+    }
+
+    if (!$arggens) {
+	if ($retisgen) {
+	    $name = 'p_' . $name; 
+	} else {
+	    print NOTUSED $theline;
+	    next LINE;
+	}
+    }
+
+    $newargs = join(', ',@newargs);
+    $arglist = join(', ',@argname); 
+
+    if (!$names { $name }){
+	print "inline $ret $name", "(", $newargs, ")\n";
+	print "{ $callname(", $arglist, "); }\n"; 
+    }
+
+    $names { $name } = 1;
+}

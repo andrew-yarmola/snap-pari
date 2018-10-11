@@ -1,0 +1,3 @@
+#!/bin/sh
+
+g++ rdhtest.cc -o rdhtest -I.. -L/sw/lib -L../pariwrap -lpari -lpwr

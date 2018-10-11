@@ -1,0 +1,25 @@
+The primary author of snap is:
+
+ Oliver A. Goodman                  Department of Maths and Stats     
+ oag@ms.unimelb.edu.au              University of Melbourne       
+ http://www.ms.unimelb.edu.au/~oag/ Parkville, Vic 3052
+ Tel: +61 3 8344-9710               AUSTRALIA
+
+With contributions from:
+ Damian Heard, University of Melbourne. 
+ Craig D. Hodgson, University of Melbourne. 
+ Sivathasan Saravanabavananthan, University of Melbourne. 
+
+Based on an original idea of 
+ Walter D. Neumann, Department of Mathematics, Barnard College, 
+ Columbia University. 
+
+The snap distribution also includes:
+ modified versions of code written for SnapPea by
+  Jeff Weeks <weeks@northnet.org>;
+ modified versions of code relating to links (dt2snap.cc &c.) by
+  Morwen Thistlethwaite, University of Tennessee, Knoxville. 
+
+Work supported by Australian Research Council, Large Grants and
+ Discovery Grants, 1994-2005 and the University of Melbourne.  
+
