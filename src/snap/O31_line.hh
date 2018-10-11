@@ -59,7 +59,6 @@ public:
 
   O31_vector end(int i) const; 
 
-  friend int compare(O31_line const& a, O31_line const& b, double eps=O31_line::epsilon);
 
   // void normalize(); 
   void transform_by(const O31_matrix& mx) { trans.left_mul(mx); }
@@ -83,5 +82,7 @@ public:
 
   static double epsilon;
 };
+
+int compare(O31_line const& a, O31_line const& b, double eps=O31_line::epsilon);
 
 #endif 

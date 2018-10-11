@@ -1,8 +1,8 @@
 #ifndef _p_VS_hh_
 #define _p_VS_hh_
 
-#include "pariwrap.hh"
 #include <iostream>
+#include "pariwrap.hh"
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>

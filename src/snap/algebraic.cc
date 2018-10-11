@@ -308,7 +308,7 @@ bool commensurable_shapes(pari const& a, pari const& b)
   pl = length(R); if (pl>l) pl=l; // just in case. 
   for (col=0; col<pl; col++) M[col][3] = R[pl-col-1];
 
-  return rank(M) < 4;
+  return rank(M.P()) < 4;
 }
 
 // Returns a vector of integers of length equal to 

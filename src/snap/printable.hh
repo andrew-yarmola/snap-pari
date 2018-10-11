@@ -87,7 +87,8 @@ class p_printable_sequence : public printable, private seq_delims {
   Seq const& S;
 public:
   p_printable_sequence(Seq const& S0, const char* delims, bool esep=false)
-    : seq_delims(delims, esep), S(S0) {}
+    : seq_delims(delims), S(S0) {}
+//    : seq_delims(delims, esep), S(S0) {}
 
   virtual void print(std::ostream& out) const; 
 };

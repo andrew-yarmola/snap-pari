@@ -168,17 +168,17 @@ public:
   void x_reflect();
   bool has_mark(Mark m) const;
   void compute_bounds(bbox& b, eqsfunc const& surface, double& rad) const;
-
-  friend void interval_difference(interval_list& A, interval_list& B, double eps, int report=0);
+  void subdivide(Complex const& p, double eps);
 
 private:
 
   void push_back(eqs_interval const& i) { L.push_back(i); }
-  void subdivide(Complex const& p, double eps);
   bool end_connects(list<eqs_interval>::const_iterator it0) const;
   void tidy();
   void get_boundary(vector<Complex>& b) const;
 };
+
+void interval_difference(interval_list& A, interval_list& B, double eps, int report=0);
 
 typedef list<eqs_interval>::iterator eqs_iter;
 typedef list<eqs_interval>::const_iterator eqs_const_iter;

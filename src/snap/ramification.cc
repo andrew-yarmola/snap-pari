@@ -22,8 +22,8 @@
 #include <config.h>
 #endif
 #include <sys/times.h>
-#include "pariwrap.hh"
 #include <iostream>
+#include "pariwrap.hh"
 
 static pari solve_hilbert_equation(const pari& nf, pari a, pari b, const pari& ideal, int idealpow, int report, int abort_after);
 

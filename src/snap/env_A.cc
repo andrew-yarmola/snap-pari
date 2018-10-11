@@ -178,6 +178,7 @@ enum {
   PrintBorel,
   PrintCuspInfo,
   PrintCuspCommensurability,
+  PrintName,
 
 };
 
@@ -221,6 +222,7 @@ void env_A::setup_menu()
   mm.add_item("print borel_regulator", PrintBorel); 
 
   mm.add_item("print cusp invariant", PrintCuspInfo); 
+  mm.add_item("print name", PrintName); 
   mm.add_item("print cusp commensurability", PrintCuspCommensurability); 
   mm.add_item("print eigenvalue_fields", ComputeEigenvalueFields); 
   mm.add_item("print units", ComputeUnits); 
@@ -1950,6 +1952,10 @@ void env_A::process_event(int what)
     }     
     break;
 
+  case PrintName:
+    printf("name : %s\n", get_filling_name(m->M()).c_str());
+    break;
+ 
   case PrintCuspInfo:
     if (!m->tetfield().is_set()) {
       printf("Shape field required for this function.\n"); 

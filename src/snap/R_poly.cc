@@ -37,10 +37,10 @@ static bool newton_ok;
 
 // Treat vector doubles as polynomials. 
 
-static double abs(double x)
-{
-  return x > 0 ? x : -x; 
-}
+//static double abs(double x)
+//{
+//  return x > 0 ? x : -x; 
+//}
 
 R_poly operator * (R_poly const& a, R_poly const& b)
 {

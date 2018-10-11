@@ -703,12 +703,14 @@ void env_D::process_event(int what)
       
       if (!compute_geodesics(radius)) break;
       int i,n = num_geodesics();
+      int old_cout_prec = cout.precision(16);
       for (i=0; i<n; i++) {
 	if (geodesic(i).length.real > radius) break; 
 	cout << '[' << i << ']';
 	if (i < 10) cout << ' ';
 	cout << geodesic(i) << endl;
       }
+    cout.precision(old_cout_prec);
     }
     break; 
     
@@ -941,10 +943,12 @@ void env_D::process_event(int what)
       if (!geodesics.size()) break; 
       
       vector<Ortholine> S = ortholines(geodesics, radius);
+      int old_cout_prec = cout.precision(16);
       vector<Ortholine>::const_iterator it; 
       for (it = S.begin(); it != S.end(); it++)
 	cout << *it << endl;
       cout << S.size() << " ortholines\n";
+      cout.precision(old_cout_prec);
     }
     break;
 
@@ -966,12 +970,14 @@ void env_D::process_event(int what)
       Ortholine_set OS;
       new_ortholines(domain, ivls, geodesics, radius, OS);
 
+      int old_cout_prec = cout.precision(16);
       Ortholine_set::const_iterator it; 
       for (it = OS.begin(); it != OS.end(); it++)
 	cout << *it << endl;
       cout << OS.size() << " ortholines\n";
 
       // cout << "There were " << count_lifts(domain, ivls, radius) << " lifts\n"; 
+      cout.precision(old_cout_prec);
     }
     break;
     
